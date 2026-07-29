@@ -1,26 +1,42 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: var(--font-sans);
+
+  /* Core palette — warm, restrained, confident */
+  --ink: #111113;        /* primary text, near-black not pure black */
+  --canvas: #ffffff;      /* page background */
+  --cloud: #f5f5f4;       /* secondary surface, card backgrounds */
+  --line: #e5e5e2;        /* hairline borders, dividers */
+  --signal: #0a84ff;      /* primary accent — Apple-style system blue, used for CTAs/links only */
+  --brass: #b08d57;       /* secondary accent — warm gold, reserved for "premium" badges/highlights */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --ink: #f5f5f4;
+  --canvas: #0a0a0b;
+  --cloud: #161617;
+  --line: #2a2a2c;
+  --signal: #0a84ff;
+  --brass: #d4b378;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .text-display {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  .text-heading {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  .text-body {
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  .text-caption {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
 }
