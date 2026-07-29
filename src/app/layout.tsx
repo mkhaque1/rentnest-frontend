@@ -7,7 +7,7 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  weight: ['100', '300', '400', '600', '700', '900'],
   style: ['normal', 'italic'],
 });
 

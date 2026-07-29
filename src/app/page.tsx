@@ -1,4 +1,3 @@
-import { apiClient } from '@/lib/api-client';
 import { ApiResponse } from '@/types/api';
 import { Property } from '@/types/property';
 import { Navbar } from '@/components/layout/Navbar';
@@ -8,9 +7,21 @@ import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 
+// Cache for 5 minutes — avoids hammering the backend on every visit
+export const revalidate = 300;
+
 async function getFeaturedProperties(): Promise<Property[]> {
-  const res = await apiClient.get<ApiResponse<Property[]>>('/api/properties');
-  return res.data.data.slice(0, 6);
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/properties`,
+      { next: { revalidate: 300 } },
+    );
+    if (!res.ok) return [];
+    const json: ApiResponse<Property[]> = await res.json();
+    return json.data.slice(0, 6);
+  } catch {
+    return [];
+  }
 }
 
 export default async function Home() {
