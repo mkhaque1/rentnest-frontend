@@ -1,0 +1,117 @@
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { MapPin, Tag, Layers } from 'lucide-react';
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
+import { Badge } from '@/components/ui/badge';
+import { RequestRentalButton } from '@/features/rentals/components/request-rental-button';
+import { ApiResponse } from '@/types/api';
+import { Property } from '@/types/property';
+
+async function getProperty(id: string): Promise<Property | null> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/properties/${id}`,
+      {
+        next: { revalidate: 60 },
+      },
+    );
+    if (!res.ok) return null;
+    const json: ApiResponse<Property> = await res.json();
+    return json.data;
+  } catch {
+    return null;
+  }
+}
+
+export default async function PropertyDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const property = await getProperty(id);
+
+  if (!property) {
+    notFound();
+  }
+
+  return (
+    <>
+      <Navbar />
+      <main className='mx-auto max-w-6xl px-6 py-12'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-10'>
+          <div className='lg:col-span-2 space-y-6'>
+            <div className='relative h-80 rounded-xl bg-card border border-border surface-edge overflow-hidden flex items-center justify-center'>
+              {property.images?.[0] ? (
+                <Image
+                  src={property.images[0]}
+                  alt={property.title}
+                  fill
+                  className='object-cover'
+                  sizes='(max-width: 1024px) 100vw, 66vw'
+                  priority
+                  loading='eager'
+                />
+              ) : (
+                <span className='text-muted-foreground text-caption'>
+                  No image available
+                </span>
+              )}
+            </div>
+
+            <div>
+              <Badge className='capitalize mb-3'>
+                {property.category.name}
+              </Badge>
+              <h1 className='text-display text-3xl'>{property.title}</h1>
+              <div className='flex items-center gap-1.5 text-muted-foreground text-caption mt-2'>
+                <MapPin className='h-4 w-4' />
+                {property.location}
+              </div>
+            </div>
+
+            <p className='text-body leading-relaxed'>{property.description}</p>
+
+            {property.amenities?.length > 0 && (
+              <div>
+                <h2 className='text-heading text-lg mb-3'>Amenities</h2>
+                <div className='flex flex-wrap gap-2'>
+                  {property.amenities.map((amenity) => (
+                    <span
+                      key={amenity}
+                      className='flex items-center gap-1.5 text-caption bg-secondary px-3 py-1.5 rounded-full'
+                    >
+                      <Tag className='h-3 w-3' />
+                      {amenity}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {property.landlord && (
+              <div className='flex items-center gap-2 text-caption text-muted-foreground pt-2'>
+                <Layers className='h-4 w-4' />
+                Listed by {property.landlord.name}
+              </div>
+            )}
+          </div>
+
+          <aside>
+            <div className='sticky top-24 rounded-xl border border-border bg-card surface-edge p-6 space-y-4'>
+              <div className='flex items-baseline gap-1'>
+                <span className='text-display text-3xl'>
+                  ৳{Number(property.price).toLocaleString()}
+                </span>
+                <span className='text-muted-foreground text-caption'>/mo</span>
+              </div>
+              <RequestRentalButton propertyId={property.id} />
+            </div>
+          </aside>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
