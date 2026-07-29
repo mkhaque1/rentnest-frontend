@@ -6,6 +6,7 @@ export interface ApiResponse<T> {
     page?: number;
     limit?: number;
     total?: number;
+    totalPage?: number;
   };
 }
 
