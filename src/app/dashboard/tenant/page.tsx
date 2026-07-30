@@ -29,6 +29,7 @@ import { useMyPayments } from '@/features/payments/hooks/use-my-payments';
 import { RentalRequest } from '@/types/rental';
 import { Payment } from '@/types/payment';
 import { useRouter } from 'next/navigation';
+import { ReviewDialog } from '@/features/reviews/components/review-dialog';
 import { EmptyState } from '@/components/shared/empty-state';
 
 /* ─── Status config ──────────────────────────────────────── */
@@ -644,6 +645,11 @@ function RentalRow({
         <Badge variant='outline' className={cn('text-xs', cfg.className)}>
           {cfg.label}
         </Badge>
+        {rental.status === 'COMPLETED' && (
+          <div onClick={(e) => e.preventDefault()}>
+            <ReviewDialog rentalRequestId={rental.id} />
+          </div>
+        )}
         <p className='text-heading text-sm'>
           ৳{Number(rental.property.price).toLocaleString()}
           <span className='text-muted-foreground font-normal text-xs'>/mo</span>
