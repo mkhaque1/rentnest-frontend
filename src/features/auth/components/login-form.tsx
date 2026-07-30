@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { AuthResult } from '@/types/user';
 export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
+  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -36,12 +37,14 @@ export function LoginForm() {
       login(accessToken, refreshToken, user);
       toast.success('Welcome back');
 
+      const redirectTo = searchParams.get('redirect');
       const redirectMap = {
         TENANT: '/dashboard/tenant',
         LANDLORD: '/dashboard/landlord',
         ADMIN: '/dashboard/admin',
       };
-      router.push(redirectMap[user.role]);
+
+      router.push(redirectTo || redirectMap[user.role]);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Invalid email or password');
