@@ -61,6 +61,27 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+      <div className='space-y-1.5 flex justify-between items-center flex-col gap-2'>
+        <Label htmlFor='role'>I am a</Label>
+        <Select
+          onValueChange={(value) =>
+            setValue('role', value as 'TENANT' | 'LANDLORD')
+          }
+        >
+          <SelectTrigger id='role'>
+            <SelectValue placeholder='Select role' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='TENANT'>Tenant — looking for a place</SelectItem>
+            <SelectItem value='LANDLORD'>
+              Landlord — listing a property
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.role && (
+          <p className='text-caption text-destructive'>{errors.role.message}</p>
+        )}
+      </div>
       <div className='space-y-1.5'>
         <Label htmlFor='name'>Full name</Label>
         <Input id='name' {...register('name')} />
@@ -86,28 +107,6 @@ export function RegisterForm() {
           <p className='text-caption text-destructive'>
             {errors.password.message}
           </p>
-        )}
-      </div>
-
-      <div className='space-y-1.5'>
-        <Label htmlFor='role'>I am a</Label>
-        <Select
-          onValueChange={(value) =>
-            setValue('role', value as 'TENANT' | 'LANDLORD')
-          }
-        >
-          <SelectTrigger id='role'>
-            <SelectValue placeholder='Select role' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='TENANT'>Tenant — looking for a place</SelectItem>
-            <SelectItem value='LANDLORD'>
-              Landlord — listing a property
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.role && (
-          <p className='text-caption text-destructive'>{errors.role.message}</p>
         )}
       </div>
 
