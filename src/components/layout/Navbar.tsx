@@ -39,12 +39,12 @@ export function Navbar() {
           <span className='text-heading text-lg tracking-tight'>RentNest</span>
         </Link>
 
-        <nav className='hidden md:flex items-center gap-8 text-caption text-muted-foreground'>
+        <nav className='hidden md:flex px-4 py-1 rounded-4xl bg-zinc-800 items-center gap-8 text-caption text-muted-foreground'>
           <Link
             href='/properties'
             className='hover:text-foreground transition-colors'
           >
-            Browse
+            Browse Properties
           </Link>
         </nav>
 

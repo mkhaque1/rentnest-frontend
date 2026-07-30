@@ -6,7 +6,6 @@ import {
   Home,
   CreditCard,
   Bell,
-  Settings,
   LogOut,
   MapPin,
   ChevronRight,
@@ -17,6 +16,7 @@ import {
   Search,
   Plus,
   LayoutDashboard,
+  Settings,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -29,24 +29,43 @@ import { useMyPayments } from '@/features/payments/hooks/use-my-payments';
 import { RentalRequest } from '@/types/rental';
 import { Payment } from '@/types/payment';
 import { useRouter } from 'next/navigation';
+import { EmptyState } from '@/components/shared/empty-state';
 
 /* ─── Status config ──────────────────────────────────────── */
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  ACTIVE:    { label: 'Active',    className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-  PENDING:   { label: 'Pending',   className: 'bg-amber-500/15 text-amber-400 border-amber-500/30'       },
-  APPROVED:  { label: 'Approved',  className: 'bg-primary/15 text-primary border-primary/30'             },
-  REJECTED:  { label: 'Rejected',  className: 'bg-destructive/15 text-destructive border-destructive/30' },
-  COMPLETED: { label: 'Completed', className: 'bg-muted text-muted-foreground border-border'             },
-  FAILED:    { label: 'Failed',    className: 'bg-destructive/15 text-destructive border-destructive/30' },
+  ACTIVE: {
+    label: 'Active',
+    className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  },
+  PENDING: {
+    label: 'Pending',
+    className: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  },
+  APPROVED: {
+    label: 'Approved',
+    className: 'bg-primary/15 text-primary border-primary/30',
+  },
+  REJECTED: {
+    label: 'Rejected',
+    className: 'bg-destructive/15 text-destructive border-destructive/30',
+  },
+  COMPLETED: {
+    label: 'Completed',
+    className: 'bg-muted text-muted-foreground border-border',
+  },
+  FAILED: {
+    label: 'Failed',
+    className: 'bg-destructive/15 text-destructive border-destructive/30',
+  },
 };
 
-type NavItem = 'overview' | 'rentals' | 'payments' | 'settings';
+type NavItem = 'overview' | 'rentals' | 'payments' | 'Profile';
 
 const NAV: { id: NavItem; label: string; icon: React.ElementType }[] = [
-  { id: 'overview', label: 'Overview',   icon: LayoutDashboard },
-  { id: 'rentals',  label: 'My Rentals', icon: Home            },
-  { id: 'payments', label: 'Payments',   icon: CreditCard      },
-  { id: 'settings', label: 'Settings',   icon: Settings        },
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'rentals', label: 'My Rentals', icon: Home },
+  { id: 'payments', label: 'Payments', icon: CreditCard },
+  { id: 'Profile', label: 'Profile', icon: Settings },
 ];
 
 /* ─── Page ───────────────────────────────────────────────── */
@@ -89,7 +108,7 @@ export default function TenantDashboardPage() {
           {active === 'payments' && (
             <PaymentsTab payments={payments} isLoading={paymentsLoading} />
           )}
-          {active === 'settings' && <SettingsTab user={user} />}
+          {active === 'Profile' && <ProfileTab user={user} />}
         </main>
       </div>
     </div>
@@ -124,7 +143,7 @@ function Sidebar({
             key={id}
             onClick={() => onNav(id)}
             className={cn(
-              'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+              'w-full flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
               active === id
                 ? 'bg-secondary text-foreground'
                 : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60',
@@ -200,18 +219,42 @@ function OverviewTab({
   paymentsLoading: boolean;
   onNav: (n: NavItem) => void;
 }) {
-  const activeCount    = rentals.filter((r) => r.status === 'ACTIVE').length;
-  const pendingCount   = rentals.filter((r) => r.status === 'PENDING').length;
+  const activeCount = rentals.filter((r) => r.status === 'ACTIVE').length;
+  const pendingCount = rentals.filter((r) => r.status === 'PENDING').length;
   const completedCount = rentals.filter((r) => r.status === 'COMPLETED').length;
-  const totalPaid      = payments
+  const totalPaid = payments
     .filter((p) => p.status === 'COMPLETED')
     .reduce((sum, p) => sum + p.amount, 0);
 
   const stats = [
-    { label: 'Active Rentals',   value: String(activeCount),                   icon: Home,         color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { label: 'Pending Requests', value: String(pendingCount),                  icon: Clock,        color: 'text-amber-400',   bg: 'bg-amber-500/10'   },
-    { label: 'Total Paid',       value: `৳${totalPaid.toLocaleString()}`,      icon: TrendingUp,   color: 'text-primary',     bg: 'bg-primary/10'     },
-    { label: 'Completed',        value: String(completedCount),                icon: CheckCircle2, color: 'text-sky-400',     bg: 'bg-sky-500/10'     },
+    {
+      label: 'Active Rentals',
+      value: String(activeCount),
+      icon: Home,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-500/10',
+    },
+    {
+      label: 'Pending Requests',
+      value: String(pendingCount),
+      icon: Clock,
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
+    },
+    {
+      label: 'Total Paid',
+      value: `৳${totalPaid.toLocaleString()}`,
+      icon: TrendingUp,
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+    },
+    {
+      label: 'Completed',
+      value: String(completedCount),
+      icon: CheckCircle2,
+      color: 'text-sky-400',
+      bg: 'bg-sky-500/10',
+    },
   ];
 
   const firstName = user?.name?.split(' ')[0] ?? 'there';
@@ -236,12 +279,19 @@ function OverviewTab({
                 key={label}
                 className='rounded-2xl border border-border bg-card surface-edge p-5 space-y-3'
               >
-                <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', bg)}>
+                <div
+                  className={cn(
+                    'w-9 h-9 rounded-xl flex items-center justify-center',
+                    bg,
+                  )}
+                >
                   <Icon className={cn('h-4 w-4', color)} />
                 </div>
                 <div>
                   <p className='text-display text-2xl'>{value}</p>
-                  <p className='text-caption text-muted-foreground text-xs mt-0.5'>{label}</p>
+                  <p className='text-caption text-muted-foreground text-xs mt-0.5'>
+                    {label}
+                  </p>
                 </div>
               </div>
             ))}
@@ -265,7 +315,7 @@ function OverviewTab({
             ))}
           </div>
         ) : rentals.length === 0 ? (
-          <EmptyCard message="You haven't submitted any rental requests yet." />
+          <EmptyState message="You haven't submitted any rental requests yet." />
         ) : (
           <div className='space-y-3'>
             {rentals.slice(0, 2).map((r) => (
@@ -289,11 +339,15 @@ function OverviewTab({
         {paymentsLoading ? (
           <Skeleton className='h-40 rounded-2xl' />
         ) : payments.length === 0 ? (
-          <EmptyCard message='No payments yet.' />
+          <EmptyState message='No payments yet.' />
         ) : (
           <div className='rounded-2xl border border-border bg-card surface-edge overflow-hidden'>
             {payments.slice(0, 3).map((p, i) => (
-              <PaymentRow key={p.id} payment={p} last={i === Math.min(2, payments.length - 1)} />
+              <PaymentRow
+                key={p.id}
+                payment={p}
+                last={i === Math.min(2, payments.length - 1)}
+              />
             ))}
           </div>
         )}
@@ -311,10 +365,21 @@ function RentalsTab({
   isLoading: boolean;
 }) {
   const [filter, setFilter] = useState<string>('All');
-  const filters = ['All', 'ACTIVE', 'PENDING', 'APPROVED', 'COMPLETED', 'REJECTED'];
+  const filters = [
+    'All',
+    'ACTIVE',
+    'PENDING',
+    'APPROVED',
+    'COMPLETED',
+    'REJECTED',
+  ];
   const labels: Record<string, string> = {
-    All: 'All', ACTIVE: 'Active', PENDING: 'Pending',
-    APPROVED: 'Approved', COMPLETED: 'Completed', REJECTED: 'Rejected',
+    All: 'All',
+    ACTIVE: 'Active',
+    PENDING: 'Pending',
+    APPROVED: 'Approved',
+    COMPLETED: 'Completed',
+    REJECTED: 'Rejected',
   };
 
   const visible =
@@ -361,7 +426,7 @@ function RentalsTab({
           ))}
         </div>
       ) : visible.length === 0 ? (
-        <EmptyCard message='No rentals match this filter.' />
+        <EmptyState message='No rentals match this filter.' />
       ) : (
         <div className='space-y-3'>
           {visible.map((r) => (
@@ -397,20 +462,45 @@ function PaymentsTab({
 
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         {[
-          { label: 'Total paid',   value: `৳${totalPaid.toLocaleString()}`,    icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-          { label: 'Pending',      value: `৳${totalPending.toLocaleString()}`, icon: Clock,      color: 'text-amber-400',   bg: 'bg-amber-500/10'   },
-          { label: 'Transactions', value: String(payments.length),             icon: CreditCard, color: 'text-primary',     bg: 'bg-primary/10'     },
+          {
+            label: 'Total paid',
+            value: `৳${totalPaid.toLocaleString()}`,
+            icon: TrendingUp,
+            color: 'text-emerald-400',
+            bg: 'bg-emerald-500/10',
+          },
+          {
+            label: 'Pending',
+            value: `৳${totalPending.toLocaleString()}`,
+            icon: Clock,
+            color: 'text-amber-400',
+            bg: 'bg-amber-500/10',
+          },
+          {
+            label: 'Transactions',
+            value: String(payments.length),
+            icon: CreditCard,
+            color: 'text-primary',
+            bg: 'bg-primary/10',
+          },
         ].map(({ label, value, icon: Icon, color, bg }) => (
           <div
             key={label}
             className='rounded-2xl border border-border bg-card surface-edge p-5 flex items-center gap-4'
           >
-            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center shrink-0', bg)}>
+            <div
+              className={cn(
+                'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
+                bg,
+              )}
+            >
               <Icon className={cn('h-5 w-5', color)} />
             </div>
             <div>
               <p className='text-heading text-xl'>{value}</p>
-              <p className='text-caption text-muted-foreground text-xs'>{label}</p>
+              <p className='text-caption text-muted-foreground text-xs'>
+                {label}
+              </p>
             </div>
           </div>
         ))}
@@ -419,15 +509,21 @@ function PaymentsTab({
       {isLoading ? (
         <Skeleton className='h-60 rounded-2xl' />
       ) : payments.length === 0 ? (
-        <EmptyCard message='No payments yet.' />
+        <EmptyState message='No payments yet.' />
       ) : (
         <div className='rounded-2xl border border-border bg-card surface-edge overflow-hidden'>
           <div className='px-5 py-4 border-b border-border flex items-center justify-between'>
             <p className='text-heading text-sm'>Transaction history</p>
-            <p className='text-xs text-muted-foreground'>{payments.length} records</p>
+            <p className='text-xs text-muted-foreground'>
+              {payments.length} records
+            </p>
           </div>
           {payments.map((p, i) => (
-            <PaymentRow key={p.id} payment={p} last={i === payments.length - 1} />
+            <PaymentRow
+              key={p.id}
+              payment={p}
+              last={i === payments.length - 1}
+            />
           ))}
         </div>
       )}
@@ -435,13 +531,15 @@ function PaymentsTab({
   );
 }
 
-/* ─── Settings tab ───────────────────────────────────────── */
-function SettingsTab({ user }: { user: ReturnType<typeof useAuth>['user'] }) {
+/* ─── Profile tab ───────────────────────────────────────── */
+function ProfileTab({ user }: { user: ReturnType<typeof useAuth>['user'] }) {
   return (
     <div className='space-y-6 max-w-lg'>
       <div>
-        <h1 className='text-display text-2xl'>Settings</h1>
-        <p className='text-body text-sm mt-1'>Manage your account preferences.</p>
+        <h1 className='text-display text-2xl'>Profile</h1>
+        <p className='text-body text-sm mt-1'>
+          Manage your account preferences.
+        </p>
       </div>
 
       <div className='rounded-2xl border border-border bg-card surface-edge p-6 space-y-5'>
@@ -467,7 +565,7 @@ function SettingsTab({ user }: { user: ReturnType<typeof useAuth>['user'] }) {
 
         <div className='space-y-3'>
           {[
-            { label: 'Full name',    value: user?.name  ?? '' },
+            { label: 'Full name', value: user?.name ?? '' },
             { label: 'Email address', value: user?.email ?? '' },
             { label: 'Phone number', value: user?.phone ?? '' },
           ].map(({ label, value }) => (
@@ -555,18 +653,17 @@ function RentalRow({
   );
 }
 
-function PaymentRow({
-  payment,
-  last,
-}: {
-  payment: Payment;
-  last: boolean;
-}) {
+function PaymentRow({ payment, last }: { payment: Payment; last: boolean }) {
   const cfg = STATUS_CONFIG[payment.status] ?? STATUS_CONFIG.PENDING;
   const date = payment.paidAt ?? payment.createdAt;
 
   return (
-    <div className={cn('flex items-center gap-4 px-5 py-4', !last && 'border-b border-border')}>
+    <div
+      className={cn(
+        'flex items-center gap-4 px-5 py-4',
+        !last && 'border-b border-border',
+      )}
+    >
       <div className='h-9 w-9 rounded-xl bg-secondary border border-border flex items-center justify-center shrink-0'>
         <CreditCard className='h-4 w-4 text-muted-foreground' />
       </div>
@@ -591,14 +688,6 @@ function PaymentRow({
           {cfg.label}
         </Badge>
       </div>
-    </div>
-  );
-}
-
-function EmptyCard({ message }: { message: string }) {
-  return (
-    <div className='rounded-2xl border border-border border-dashed bg-card p-8 text-center'>
-      <p className='text-body text-sm'>{message}</p>
     </div>
   );
 }
