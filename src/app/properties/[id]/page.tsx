@@ -106,7 +106,22 @@ export default async function PropertyDetailsPage({
                 </span>
                 <span className='text-muted-foreground text-caption'>/mo</span>
               </div>
-              <RequestRentalButton propertyId={property.id} />
+              <div className='flex items-center gap-2'>
+                <span
+                  className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${
+                    property.status === 'AVAILABLE'
+                      ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                      : 'bg-destructive/15 text-destructive border-destructive/30'
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${property.status === 'AVAILABLE' ? 'bg-emerald-400' : 'bg-destructive'}`} />
+                  {property.status === 'AVAILABLE' ? 'Available' : 'Currently rented'}
+                </span>
+              </div>
+              <RequestRentalButton
+                propertyId={property.id}
+                status={property.status}
+              />
             </div>
           </aside>
         </div>

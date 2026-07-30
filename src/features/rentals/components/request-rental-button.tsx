@@ -17,7 +17,13 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useCreateRental } from '../hooks/use-create-rental';
 
-export function RequestRentalButton({ propertyId }: { propertyId: string }) {
+export function RequestRentalButton({
+  propertyId,
+  status,
+}: {
+  propertyId: string;
+  status: string;
+}) {
   const [open, setOpen] = useState(false);
   const [moveInDate, setMoveInDate] = useState('');
   const [message, setMessage] = useState('');
@@ -25,7 +31,10 @@ export function RequestRentalButton({ propertyId }: { propertyId: string }) {
   const router = useRouter();
   const { mutate, isPending } = useCreateRental();
 
+  const isAvailable = status === 'AVAILABLE';
+
   function handleTriggerClick(e: React.MouseEvent) {
+    if (!isAvailable) return;
     if (!user) {
       e.preventDefault();
       router.push(`/auth/login?redirect=/properties/${propertyId}`);
@@ -68,8 +77,13 @@ export function RequestRentalButton({ propertyId }: { propertyId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size='lg' className='w-full' onClick={handleTriggerClick}>
-          Request to rent
+        <Button
+          size='lg'
+          className='w-full'
+          onClick={handleTriggerClick}
+          disabled={!isAvailable}
+        >
+          {isAvailable ? 'Request to rent' : 'Not available'}
         </Button>
       </DialogTrigger>
       <DialogContent>
