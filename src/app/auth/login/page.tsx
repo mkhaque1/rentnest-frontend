@@ -7,7 +7,8 @@ export default function LoginPage() {
     <main className='min-h-screen flex items-center justify-center px-6'>
       <div className='w-full max-w-sm space-y-6'>
         <div className='text-center'>
-          <h1 className='text-heading text-2xl'>Welcome back</h1>
+          <h1 className='text-heading text-5xl mb-5'>RentNest</h1>
+          <h2 className='text-lg font-semibold'>Welcome back</h2>
           <p className='text-body text-sm mt-1'>Sign in to continue</p>
         </div>
         <LoginForm />

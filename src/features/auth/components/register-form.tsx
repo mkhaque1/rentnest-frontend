@@ -62,7 +62,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <div className='space-y-1.5 flex justify-between items-center flex-col gap-2'>
-        <Label htmlFor='role'>I am a</Label>
+        <Label htmlFor='role'>Choose your role</Label>
         <Select
           onValueChange={(value) =>
             setValue('role', value as 'TENANT' | 'LANDLORD')
