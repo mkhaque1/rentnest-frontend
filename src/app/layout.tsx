@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/providers/query-provider';
 import { AuthProvider } from '@/providers/auth-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,7 +27,10 @@ export default function RootLayout({
     <html lang='en' className={`dark ${inter.variable}`}>
       <body className='font-sans antialiased'>
         <QueryProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <Toaster theme='dark' position='top-center' />
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>
