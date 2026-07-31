@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, BedDouble } from 'lucide-react';
+import { MapPin, BedDouble, Bath } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Property } from '@/types/property';
 
@@ -32,15 +32,23 @@ export function PropertyCard({ property }: { property: Property }) {
       </div>
 
       <div className='p-4 space-y-2'>
-        <div className='flex items-start justify-between gap-2'>
-          <h3 className='text-heading text-base line-clamp-1'>
-            {property.title}
-          </h3>
-        </div>
+        <h3 className='text-heading text-base line-clamp-1'>{property.title}</h3>
 
         <div className='flex items-center gap-1.5 text-muted-foreground text-caption'>
-          <MapPin className='h-3.5 w-3.5' />
+          <MapPin className='h-3.5 w-3.5 shrink-0' />
           <span className='line-clamp-1'>{property.location}</span>
+        </div>
+
+        {/* Bedrooms / bathrooms */}
+        <div className='flex items-center gap-3 text-caption text-muted-foreground'>
+          <span className='flex items-center gap-1'>
+            <BedDouble className='h-3.5 w-3.5' />
+            {property.bedrooms} {property.bedrooms === 1 ? 'bed' : 'beds'}
+          </span>
+          <span className='flex items-center gap-1'>
+            <Bath className='h-3.5 w-3.5' />
+            {property.bathrooms} {property.bathrooms === 1 ? 'bath' : 'baths'}
+          </span>
         </div>
 
         <div className='flex items-baseline gap-1 pt-1'>

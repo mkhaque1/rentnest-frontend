@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { MapPin, Tag, Layers } from 'lucide-react';
+import { MapPin, Tag, Layers, BedDouble, Bath, Ruler } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +68,22 @@ export default async function PropertyDetailsPage({
               <div className='flex items-center gap-1.5 text-muted-foreground text-caption mt-2'>
                 <MapPin className='h-4 w-4' />
                 {property.location}
+              </div>
+              <div className='flex items-center gap-4 mt-3 text-caption text-muted-foreground'>
+                <span className='flex items-center gap-1.5'>
+                  <BedDouble className='h-4 w-4' />
+                  {property.bedrooms} {property.bedrooms === 1 ? 'bedroom' : 'bedrooms'}
+                </span>
+                <span className='flex items-center gap-1.5'>
+                  <Bath className='h-4 w-4' />
+                  {property.bathrooms} {property.bathrooms === 1 ? 'bathroom' : 'bathrooms'}
+                </span>
+                {property.area && (
+                  <span className='flex items-center gap-1.5'>
+                    <Ruler className='h-4 w-4' />
+                    {property.area} sq ft
+                  </span>
+                )}
               </div>
             </div>
 
