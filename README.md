@@ -9,6 +9,7 @@ This repository contains the **frontend** application. The backend API is mainta
 ## Features
 
 ### Tenant
+
 - Browse and filter properties by location, price, and category
 - View detailed property pages with images, amenities, bedrooms/bathrooms
 - Submit rental requests with move-in date and message
@@ -18,12 +19,14 @@ This repository contains the **frontend** application. The backend API is mainta
 - Personal dashboard with rental history, payment history, and stats
 
 ### Landlord
+
 - List new properties with images, pricing, amenities, and category
 - Edit and delete existing listings
 - Review incoming rental requests — approve, reject, or mark as completed
 - Dashboard showing all listings with status and quick edit access
 
 ### Admin
+
 - Platform-wide overview: user count, property count, pending requests
 - Manage all users — view roles, ban/unban accounts
 - View all properties across the platform
@@ -34,19 +37,19 @@ This repository contains the **frontend** application. The backend API is mainta
 
 ## Tech Stack
 
-| Layer        | Technology                          |
-|--------------|-------------------------------------|
-| Framework    | Next.js 16 (App Router)             |
-| Language     | TypeScript 5                        |
-| Styling      | Tailwind CSS v4                     |
-| UI Components| Radix UI + shadcn/ui                |
-| Forms        | React Hook Form + Zod v4            |
-| Data Fetching| TanStack Query v5 (React Query)     |
-| HTTP Client  | Axios                               |
-| Auth         | JWT stored in cookies (js-cookie)   |
-| Icons        | Lucide React + HugeIcons            |
-| Toasts       | Sonner                              |
-| Font         | Inter (Google Fonts via next/font)  |
+| Layer         | Technology                         |
+| ------------- | ---------------------------------- |
+| Framework     | Next.js 16 (App Router)            |
+| Language      | TypeScript 5                       |
+| Styling       | Tailwind CSS v4                    |
+| UI Components | Radix UI + shadcn/ui               |
+| Forms         | React Hook Form + Zod v4           |
+| Data Fetching | TanStack Query v5 (React Query)    |
+| HTTP Client   | Axios                              |
+| Auth          | JWT stored in cookies (js-cookie)  |
+| Icons         | Lucide React + HugeIcons           |
+| Toasts        | Sonner                             |
+| Font          | Inter (Google Fonts via next/font) |
 
 ---
 
@@ -148,25 +151,24 @@ The backend is a separate project: **RentNest Backend**
 
 It provides a REST API built with Node.js/Express and Prisma ORM. Key endpoints used by this frontend:
 
-| Resource      | Base path                    |
-|---------------|------------------------------|
-| Auth          | `/api/auth`                  |
-| Properties    | `/api/properties`            |
-| Categories    | `/api/categories`            |
-| Rentals       | `/api/rentals`               |
-| Payments      | `/api/payments`              |
-| Reviews       | `/api/reviews`               |
-| Admin         | `/api/admin`                 |
+| Resource   | Base path         |
+| ---------- | ----------------- |
+| Auth       | `/api/auth`       |
+| Properties | `/api/properties` |
+| Categories | `/api/categories` |
+| Rentals    | `/api/rentals`    |
+| Payments   | `/api/payments`   |
+| Reviews    | `/api/reviews`    |
+| Admin      | `/api/admin`      |
 
 ---
 
 ## Test Credentials
 
-| Role     | Email                  | Password   |
-|----------|------------------------|------------|
-| Tenant   | tenant@test.com        | 123456     |
-| Landlord | landlord@test.com      | 123456     |
-| Admin    | admin@rentnest.com     | admin123   |
+| Role     | Email             | Password |
+| -------- | ----------------- | -------- |
+| Tenant   | tenant@test.com   | 123456   |
+| Landlord | landlord@test.com | 123456   |
 
 ---
 
