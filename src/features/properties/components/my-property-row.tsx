@@ -22,6 +22,10 @@ import { getApiErrorMessage } from '@/lib/api-error';
 
 export function MyPropertyRow({ property }: { property: Property }) {
   const { mutate: deleteProperty, isPending } = useDeleteProperty();
+  const propertyDetails =
+    property.bedrooms !== undefined && property.bathrooms !== undefined
+      ? `${property.bedrooms} bed · ${property.bathrooms} bath`
+      : property.type ?? property.category.name;
 
   function handleDelete() {
     deleteProperty(property.id, {
@@ -38,7 +42,7 @@ export function MyPropertyRow({ property }: { property: Property }) {
         <p className='text-heading text-base'>{property.title}</p>
         <p className='text-caption text-muted-foreground mt-1'>
           {property.location} · ৳{Number(property.price).toLocaleString()}/mo ·{' '}
-          {property.bedrooms} bed · {property.bathrooms} bath
+          {propertyDetails}
         </p>
       </div>
 

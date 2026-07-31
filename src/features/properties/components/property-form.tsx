@@ -84,33 +84,6 @@ export function PropertyForm({
         </div>
       </div>
 
-      <div className='grid grid-cols-2 gap-4'>
-        <div className='space-y-1.5'>
-          <Label htmlFor='bedrooms'>Bedrooms</Label>
-          <Input
-            id='bedrooms'
-            type='number'
-            min='0'
-            {...register('bedrooms', { valueAsNumber: true })}
-          />
-          {errors.bedrooms && (
-            <p className='text-caption text-destructive'>{errors.bedrooms.message}</p>
-          )}
-        </div>
-        <div className='space-y-1.5'>
-          <Label htmlFor='bathrooms'>Bathrooms</Label>
-          <Input
-            id='bathrooms'
-            type='number'
-            min='0'
-            {...register('bathrooms', { valueAsNumber: true })}
-          />
-          {errors.bathrooms && (
-            <p className='text-caption text-destructive'>{errors.bathrooms.message}</p>
-          )}
-        </div>
-      </div>
-
       <div className='space-y-1.5'>
         <Label>Category</Label>
         <Select value={categoryField.value} onValueChange={categoryField.onChange}>
@@ -128,18 +101,6 @@ export function PropertyForm({
         {errors.categoryId && (
           <p className='text-caption text-destructive'>{errors.categoryId.message}</p>
         )}
-      </div>
-
-      <div className='space-y-1.5'>
-        <Label htmlFor='images'>Image URLs (comma-separated)</Label>
-        <Input
-          id='images'
-          placeholder='https://example.com/photo1.jpg, https://...'
-          {...register('images')}
-        />
-        <p className='text-xs text-muted-foreground'>
-          Paste one or more direct image URLs, separated by commas.
-        </p>
       </div>
 
       <div className='space-y-1.5'>

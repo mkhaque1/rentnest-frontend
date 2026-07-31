@@ -8,6 +8,8 @@ export function PropertyCard({ property }: { property: Property }) {
   const image = property.images?.[0];
   const price = Number(property.price).toLocaleString();
   const isAvailable = property.status === 'AVAILABLE';
+  const bedrooms = property.bedrooms ?? 0;
+  const bathrooms = property.bathrooms ?? 0;
 
   return (
     <Link
@@ -73,11 +75,11 @@ export function PropertyCard({ property }: { property: Property }) {
           <div className='flex items-center gap-3 text-xs text-muted-foreground'>
             <span className='flex items-center gap-1'>
               <BedDouble className='h-3.5 w-3.5' />
-              {property.bedrooms} {property.bedrooms === 1 ? 'bed' : 'beds'}
+              {bedrooms} {bedrooms === 1 ? 'bed' : 'beds'}
             </span>
             <span className='flex items-center gap-1'>
               <Bath className='h-3.5 w-3.5' />
-              {property.bathrooms} {property.bathrooms === 1 ? 'bath' : 'baths'}
+              {bathrooms} {bathrooms === 1 ? 'bath' : 'baths'}
             </span>
           </div>
           <span className='text-xs text-muted-foreground group-hover:text-foreground transition-colors'>

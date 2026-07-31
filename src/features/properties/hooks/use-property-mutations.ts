@@ -10,11 +10,9 @@ interface PropertyPayload {
   description: string;
   location: string;
   price: number;
-  bedrooms: number;
-  bathrooms: number;
+  type: string;
   categoryId: string;
   amenities?: string[];
-  images?: string[];
 }
 
 export function useCreateProperty() {

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Users, HomeIcon, FileText, LayoutDashboard, LogOut,
-  Ban, CheckCircle2, MapPin, Search, Bell, ShieldAlert,
+  Users, HomeIcon, FileText, LayoutDashboard,
+  Ban, CheckCircle2, MapPin, ShieldAlert,
   TrendingUp, Clock, Tag, Pencil, Trash2, Plus, X,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,18 +25,21 @@ import {
   useUpdateCategory,
   useDeleteCategory,
 } from '@/features/admin/hooks/use-admin-categories';
-import { getApiErrorMessage } from '@/lib/api-error';
 import { RentalStatusBadge } from '@/features/rentals/components/status-badge';
 import { PropertyCategory } from '@/types/property';
+import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
+import { DashboardNavItem } from '@/components/dashboard/dashboard-sidebar';
+import { StatCard } from '@/components/dashboard/stat-card';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 type NavItem = 'overview' | 'users' | 'properties' | 'rentals' | 'categories';
 
-const NAV: { id: NavItem; label: string; icon: React.ElementType }[] = [
-  { id: 'overview',    label: 'Overview',    icon: LayoutDashboard },
-  { id: 'users',       label: 'Users',       icon: Users           },
-  { id: 'properties',  label: 'Properties',  icon: HomeIcon        },
-  { id: 'rentals',     label: 'Rentals',     icon: FileText        },
-  { id: 'categories',  label: 'Categories',  icon: Tag             },
+const NAV_ITEMS: DashboardNavItem[] = [
+  { id: 'overview',   label: 'Overview',   icon: LayoutDashboard },
+  { id: 'users',      label: 'Users',      icon: Users           },
+  { id: 'properties', label: 'Properties', icon: HomeIcon        },
+  { id: 'rentals',    label: 'Rentals',    icon: FileText        },
+  { id: 'categories', label: 'Categories', icon: Tag             },
 ];
 
 const STATUS_BADGE: Record<string, string> = {
@@ -46,15 +49,14 @@ const STATUS_BADGE: Record<string, string> = {
   ACTIVE:    'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
 };
 
-/* ─── Page ───────────────────────────────────────────────── */
 export default function AdminDashboardPage() {
   const [active, setActive] = useState<NavItem>('overview');
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const { data: users    = [], isLoading: usersLoading    } = useAdminUsers();
-  const { data: props    = [], isLoading: propsLoading    } = useAdminProperties();
-  const { data: rentals  = [], isLoading: rentalsLoading  } = useAdminRentals();
+  const { data: users   = [], isLoading: usersLoading   } = useAdminUsers();
+  const { data: props   = [], isLoading: propsLoading   } = useAdminProperties();
+  const { data: rentals = [], isLoading: rentalsLoading } = useAdminRentals();
   const { mutate: updateStatus, isPending } = useUpdateUserStatus();
 
   function handleLogout() { logout(); router.push('/'); }
@@ -71,70 +73,23 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className='min-h-screen bg-background flex'>
-      {/* Sidebar */}
-      <aside className='hidden lg:flex flex-col w-64 border-r border-border bg-card shrink-0'>
-        <Link href='/' className='flex items-center gap-2.5 px-6 h-16 border-b border-border shrink-0'>
-          <ShieldAlert className='h-5 w-5 text-destructive' />
-          <span className='text-heading text-lg tracking-tight'>Admin</span>
-        </Link>
-
-        <nav className='flex-1 px-3 py-4 space-y-0.5'>
-          {NAV.map(({ id, label, icon: Icon }) => (
-            <button key={id} onClick={() => setActive(id)}
-              className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
-                active === id
-                  ? 'bg-secondary text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60',
-              )}>
-              <Icon className='h-4 w-4 shrink-0' />{label}
-            </button>
-          ))}
-        </nav>
-
-        <div className='px-3 pb-4 border-t border-border pt-4'>
-          <button onClick={handleLogout}
-            className='w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 transition-colors'>
-            <Avatar size='default'>
-              <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() ?? 'A'}</AvatarFallback>
-            </Avatar>
-            <div className='flex-1 min-w-0 text-left'>
-              <p className='text-sm font-medium truncate'>{user?.name ?? 'Admin'}</p>
-              <p className='text-xs text-muted-foreground truncate'>{user?.email ?? ''}</p>
-            </div>
-            <LogOut className='h-3.5 w-3.5 text-muted-foreground shrink-0' />
-          </button>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <div className='flex-1 flex flex-col min-h-screen overflow-hidden'>
-        <header className='h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-6 lg:px-10 shrink-0'>
-          <div className='relative w-64'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none' />
-            <input placeholder='Search…'
-              className='w-full h-9 rounded-xl bg-secondary border border-border pl-9 pr-3 text-sm placeholder:text-muted-foreground outline-none focus:border-ring transition-colors' />
-          </div>
-          <div className='flex items-center gap-3'>
-            <button className='h-9 w-9 rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors'>
-              <Bell className='h-4 w-4' />
-            </button>
-            <Avatar size='default'>
-              <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() ?? 'A'}</AvatarFallback>
-            </Avatar>
-          </div>
-        </header>
-
-        <main className='flex-1 overflow-y-auto px-6 py-8 lg:px-10'>
-          {active === 'overview'   && <OverviewTab users={users} props={props} rentals={rentals} usersLoading={usersLoading} propsLoading={propsLoading} rentalsLoading={rentalsLoading} onNav={setActive} />}
-          {active === 'users'      && <UsersTab users={users} isLoading={usersLoading} isPending={isPending} onToggleBan={handleToggleBan} />}
-          {active === 'properties' && <PropertiesTab props={props} isLoading={propsLoading} />}
-          {active === 'rentals'    && <RentalsTab rentals={rentals} isLoading={rentalsLoading} />}
-          {active === 'categories' && <CategoriesTab />}
-        </main>
-      </div>
-    </div>
+    <DashboardLayout
+      brand='Admin'
+      brandIcon={ShieldAlert}
+      brandIconClassName='text-destructive'
+      navItems={NAV_ITEMS}
+      activeItem={active}
+      onNav={(id) => setActive(id as NavItem)}
+      user={user}
+      onLogout={handleLogout}
+      searchPlaceholder='Search…'
+    >
+      {active === 'overview'   && <OverviewTab users={users} props={props} rentals={rentals} usersLoading={usersLoading} propsLoading={propsLoading} rentalsLoading={rentalsLoading} onNav={setActive} />}
+      {active === 'users'      && <UsersTab users={users} isLoading={usersLoading} isPending={isPending} onToggleBan={handleToggleBan} />}
+      {active === 'properties' && <PropertiesTab props={props} isLoading={propsLoading} />}
+      {active === 'rentals'    && <RentalsTab rentals={rentals} isLoading={rentalsLoading} />}
+      {active === 'categories' && <CategoriesTab />}
+    </DashboardLayout>
   );
 }
 
@@ -166,24 +121,16 @@ function OverviewTab({ users, props, rentals, usersLoading, propsLoading, rental
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
         {(usersLoading || propsLoading || rentalsLoading)
           ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className='h-28 rounded-2xl' />)
-          : stats.map(({ label, value, icon: Icon, color, bg }) => (
-            <div key={label} className='rounded-2xl border border-border bg-card surface-edge p-5 space-y-3'>
-              <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', bg)}>
-                <Icon className={cn('h-4 w-4', color)} />
-              </div>
-              <div>
-                <p className='text-display text-2xl'>{value}</p>
-                <p className='text-caption text-muted-foreground text-xs mt-0.5'>{label}</p>
-              </div>
-            </div>
-          ))}
+          : stats.map(({ label, value, icon, color, bg }) => (
+              <StatCard key={label} label={label} value={value} icon={icon} color={color} bg={bg} />
+            ))}
       </div>
       <div className='grid grid-cols-1 sm:grid-cols-4 gap-4'>
         {[
-          { label: 'Manage users',      desc: `${users?.length ?? 0} registered`,  nav: 'users'      as NavItem, icon: Users     },
-          { label: 'Review properties', desc: `${props?.length ?? 0} listings`,    nav: 'properties' as NavItem, icon: HomeIcon  },
+          { label: 'Manage users',      desc: `${users?.length ?? 0} registered`,  nav: 'users'      as NavItem, icon: Users      },
+          { label: 'Review properties', desc: `${props?.length ?? 0} listings`,    nav: 'properties' as NavItem, icon: HomeIcon   },
           { label: 'Rental requests',   desc: `${pendingRentals} pending`,         nav: 'rentals'    as NavItem, icon: TrendingUp },
-          { label: 'Categories',        desc: 'Manage property types',             nav: 'categories' as NavItem, icon: Tag       },
+          { label: 'Categories',        desc: 'Manage property types',             nav: 'categories' as NavItem, icon: Tag        },
         ].map(({ label, desc, nav, icon: Icon }) => (
           <button key={label} onClick={() => onNav(nav)}
             className='flex items-center gap-4 rounded-2xl border border-border bg-card surface-edge p-5 hover:border-primary/30 transition-colors text-left'>
@@ -329,45 +276,22 @@ function CategoriesTab() {
   const [name, setName]               = useState('');
   const [description, setDescription] = useState('');
 
-  function openCreate() {
-    setEditTarget(null);
-    setName('');
-    setDescription('');
-    setShowForm(true);
-  }
-
-  function openEdit(cat: PropertyCategory) {
-    setEditTarget(cat);
-    setName(cat.name);
-    setDescription(cat.description);
-    setShowForm(true);
-  }
-
-  function closeForm() {
-    setShowForm(false);
-    setEditTarget(null);
-    setName('');
-    setDescription('');
-  }
+  function openCreate() { setEditTarget(null); setName(''); setDescription(''); setShowForm(true); }
+  function openEdit(cat: PropertyCategory) { setEditTarget(cat); setName(cat.name); setDescription(cat.description ?? ''); setShowForm(true); }
+  function closeForm() { setShowForm(false); setEditTarget(null); setName(''); setDescription(''); }
 
   function handleSave() {
     if (!name.trim()) { toast.error('Name is required'); return; }
     if (editTarget) {
-      updateCat(
-        { id: editTarget.id, name: name.trim(), description: description.trim() },
-        {
-          onSuccess: () => { toast.success('Category updated'); closeForm(); },
-          onError:   (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to update')),
-        },
-      );
+      updateCat({ id: editTarget.id, name: name.trim(), description: description.trim() }, {
+        onSuccess: () => { toast.success('Category updated'); closeForm(); },
+        onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to update')),
+      });
     } else {
-      createCat(
-        { name: name.trim(), description: description.trim() },
-        {
-          onSuccess: () => { toast.success('Category created'); closeForm(); },
-          onError:   (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to create')),
-        },
-      );
+      createCat({ name: name.trim(), description: description.trim() }, {
+        onSuccess: () => { toast.success('Category created'); closeForm(); },
+        onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to create')),
+      });
     }
   }
 
@@ -375,7 +299,7 @@ function CategoriesTab() {
     if (!confirm(`Delete "${catName}"? Properties in this category may be affected.`)) return;
     deleteCat(id, {
       onSuccess: () => toast.success('Category deleted'),
-      onError:   (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to delete')),
+      onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to delete')),
     });
   }
 
@@ -391,7 +315,6 @@ function CategoriesTab() {
         </Button>
       </div>
 
-      {/* Inline form */}
       {showForm && (
         <div className='rounded-2xl border border-border bg-card surface-edge p-6 space-y-4'>
           <div className='flex items-center justify-between'>

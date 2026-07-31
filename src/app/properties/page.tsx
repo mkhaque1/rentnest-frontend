@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
@@ -16,15 +16,14 @@ import { SlidersHorizontal } from 'lucide-react';
 
 function PropertiesContent() {
   const searchParams = useSearchParams();
+  const type = searchParams.get('type') ?? undefined;
   const [filters, setFilters] = useState<PropertyFilters>({});
+  const activeFilters = useMemo(
+    () => ({ ...filters, type: filters.type ?? type }),
+    [filters, type],
+  );
 
-  // Sync URL params into filters on mount (e.g. ?type=studio from category section)
-  useEffect(() => {
-    const type = searchParams.get('type');
-    if (type) setFilters((f) => ({ ...f, type }));
-  }, [searchParams]);
-
-  const { data, isLoading, isError } = useProperties(filters);
+  const { data, isLoading, isError } = useProperties(activeFilters);
   const total = data?.meta?.total ?? 0;
 
   return (
@@ -47,7 +46,7 @@ function PropertiesContent() {
           </div>
         </div>
 
-        <PropertyFiltersBar filters={filters} onChange={setFilters} />
+        <PropertyFiltersBar filters={activeFilters} onChange={setFilters} />
 
         {isLoading && (
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6'>

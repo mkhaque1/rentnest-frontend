@@ -4,6 +4,7 @@ import { PropertyCard } from '@/features/properties/components/property-card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { API_BASE_URL } from '@/lib/api-config';
 import { ApiResponse } from '@/types/api';
 import { Property } from '@/types/property';
 import { HeroSection } from '@/components/home/hero-section';
@@ -17,7 +18,7 @@ export const revalidate = 300;
 async function getFeaturedProperties(): Promise<Property[]> {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/properties`,
+      `${API_BASE_URL}/api/properties`,
       { next: { revalidate: 300 } },
     );
     if (!res.ok) return [];

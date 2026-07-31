@@ -15,27 +15,6 @@ import { ApiResponse } from '@/types/api';
 import { PropertyCategory, Property } from '@/types/property';
 import { getApiErrorMessage } from '@/lib/api-error';
 
-function sanitizeImageUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    if (parsed.pathname === '/_next/image') {
-      const original = parsed.searchParams.get('url');
-      if (original) return decodeURIComponent(original);
-    }
-  } catch {
-    // not a valid URL
-  }
-  return url;
-}
-
-function parseImages(raw?: string): string[] {
-  if (!raw) return [];
-  return raw
-    .split(',')
-    .map((u) => sanitizeImageUrl(u.trim()))
-    .filter(Boolean);
-}
-
 export default function EditPropertyPage({
   params,
 }: {
@@ -65,16 +44,25 @@ export default function EditPropertyPage({
   });
 
   function handleSubmit(values: PropertyInput) {
+    const selectedCategory = categories?.find(
+      (category) => category.id === values.categoryId,
+    );
+
+    if (!selectedCategory) {
+      toast.error('Please select a valid category');
+      return;
+    }
+
     mutate(
       {
         ...values,
+        type: selectedCategory.name,
         amenities: values.amenities
           ? values.amenities
               .split(',')
               .map((a) => a.trim())
               .filter(Boolean)
           : [],
-        images: parseImages(values.images),
       },
       {
         onSuccess: () => {
@@ -102,11 +90,8 @@ export default function EditPropertyPage({
               description: property.description,
               location: property.location,
               price: Number(property.price),
-              bedrooms: property.bedrooms,
-              bathrooms: property.bathrooms,
               categoryId: property.categoryId,
               amenities: property.amenities?.join(', '),
-              images: property.images?.join(', '),
             }}
             onSubmit={handleSubmit}
             isSubmitting={isPending}

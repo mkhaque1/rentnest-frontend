@@ -5,13 +5,14 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Badge } from '@/components/ui/badge';
 import { RequestRentalButton } from '@/features/rentals/components/request-rental-button';
+import { API_BASE_URL } from '@/lib/api-config';
 import { ApiResponse } from '@/types/api';
 import { Property } from '@/types/property';
 
 async function getProperty(id: string): Promise<Property | null> {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/properties/${id}`,
+      `${API_BASE_URL}/api/properties/${id}`,
       {
         next: { revalidate: 60 },
       },
@@ -35,6 +36,10 @@ export default async function PropertyDetailsPage({
   if (!property) {
     notFound();
   }
+
+  const bedrooms = property.bedrooms ?? 0;
+  const bathrooms = property.bathrooms ?? 0;
+  const amenities = property.amenities ?? [];
 
   return (
     <>
@@ -72,11 +77,11 @@ export default async function PropertyDetailsPage({
               <div className='flex items-center gap-4 mt-3 text-caption text-muted-foreground'>
                 <span className='flex items-center gap-1.5'>
                   <BedDouble className='h-4 w-4' />
-                  {property.bedrooms} {property.bedrooms === 1 ? 'bedroom' : 'bedrooms'}
+                  {bedrooms} {bedrooms === 1 ? 'bedroom' : 'bedrooms'}
                 </span>
                 <span className='flex items-center gap-1.5'>
                   <Bath className='h-4 w-4' />
-                  {property.bathrooms} {property.bathrooms === 1 ? 'bathroom' : 'bathrooms'}
+                  {bathrooms} {bathrooms === 1 ? 'bathroom' : 'bathrooms'}
                 </span>
                 {property.area && (
                   <span className='flex items-center gap-1.5'>
@@ -89,11 +94,11 @@ export default async function PropertyDetailsPage({
 
             <p className='text-body leading-relaxed'>{property.description}</p>
 
-            {property.amenities?.length > 0 && (
+            {amenities.length > 0 && (
               <div>
                 <h2 className='text-heading text-lg mb-3'>Amenities</h2>
                 <div className='flex flex-wrap gap-2'>
-                  {property.amenities.map((amenity) => (
+                  {amenities.map((amenity) => (
                     <span
                       key={amenity}
                       className='flex items-center gap-1.5 text-caption bg-secondary px-3 py-1.5 rounded-full'

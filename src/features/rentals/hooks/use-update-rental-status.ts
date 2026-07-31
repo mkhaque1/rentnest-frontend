@@ -16,7 +16,7 @@ export function useUpdateRentalStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: UpdateStatusPayload) => {
       const res = await apiClient.patch<ApiResponse<RentalRequest>>(
-        `/api/rentals/landlord/requests/${id}`,
+        `/api/rentals/${id}/status`,
         { status },
       );
       return res.data.data;

@@ -13,28 +13,6 @@ import { ApiResponse } from '@/types/api';
 import { PropertyCategory } from '@/types/property';
 import { getApiErrorMessage } from '@/lib/api-error';
 
-/** Strip Next.js image proxy wrapper back to the original URL */
-function sanitizeImageUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    if (parsed.pathname === '/_next/image') {
-      const original = parsed.searchParams.get('url');
-      if (original) return decodeURIComponent(original);
-    }
-  } catch {
-    // not a valid URL, return as-is
-  }
-  return url;
-}
-
-function parseImages(raw?: string): string[] {
-  if (!raw) return [];
-  return raw
-    .split(',')
-    .map((u) => sanitizeImageUrl(u.trim()))
-    .filter(Boolean);
-}
-
 export default function NewPropertyPage() {
   const router = useRouter();
   const { mutate, isPending } = useCreateProperty();
@@ -49,16 +27,25 @@ export default function NewPropertyPage() {
   });
 
   function handleSubmit(values: PropertyInput) {
+    const selectedCategory = categories?.find(
+      (category) => category.id === values.categoryId,
+    );
+
+    if (!selectedCategory) {
+      toast.error('Please select a valid category');
+      return;
+    }
+
     mutate(
       {
         ...values,
+        type: selectedCategory.name,
         amenities: values.amenities
           ? values.amenities
               .split(',')
               .map((a) => a.trim())
               .filter(Boolean)
           : [],
-        images: parseImages(values.images),
       },
       {
         onSuccess: () => {

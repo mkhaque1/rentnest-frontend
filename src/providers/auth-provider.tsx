@@ -9,14 +9,13 @@ import { User } from '@/types/user';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() =>
+    Boolean(authCookies.getAccessToken()),
+  );
 
   useEffect(() => {
     const token = authCookies.getAccessToken();
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
+    if (!token) return;
 
     apiClient
       .get<ApiResponse<User>>('/api/auth/me')
