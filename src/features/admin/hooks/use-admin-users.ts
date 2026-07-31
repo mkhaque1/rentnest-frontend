@@ -27,7 +27,7 @@ export function useUpdateUserStatus() {
       status: 'ACTIVE' | 'BANNED';
     }) => {
       const res = await apiClient.patch<ApiResponse<User>>(
-        `/api/admin/users/${id}`,
+        `/api/admin/users/${id}/status`,
         { status },
       );
       return res.data.data;
