@@ -29,7 +29,6 @@ import { useMyPayments } from '@/features/payments/hooks/use-my-payments';
 import { RentalRequest } from '@/types/rental';
 import { Payment } from '@/types/payment';
 import { useRouter } from 'next/navigation';
-import { ReviewDialog } from '@/features/reviews/components/review-dialog';
 import { EmptyState } from '@/components/shared/empty-state';
 
 /* ─── Status config ──────────────────────────────────────── */
@@ -605,6 +604,7 @@ function ProfileTab({ user }: { user: ReturnType<typeof useAuth>['user'] }) {
 }
 
 /* ─── Shared components ──────────────────────────────────── */
+
 function RentalRow({
   rental,
   expanded = false,
@@ -616,46 +616,54 @@ function RentalRow({
   const image = rental.property.images?.[0];
 
   return (
-    <Link
-      href={`/properties/${rental.propertyId}`}
-      className='flex items-center gap-4 rounded-2xl border border-border bg-card surface-edge p-4 hover:border-primary/30 transition-colors'
-    >
-      <div
-        className='h-14 w-20 rounded-xl bg-secondary shrink-0 bg-cover bg-center'
-        style={image ? { backgroundImage: `url(${image})` } : undefined}
-      />
-      <div className='flex-1 min-w-0'>
-        <p className='text-heading text-sm truncate'>{rental.property.title}</p>
-        <div className='flex items-center gap-1 text-xs text-muted-foreground mt-0.5'>
-          <MapPin className='h-3 w-3 shrink-0' />
-          <span className='truncate'>{rental.property.location}</span>
-        </div>
-        {expanded && (
-          <p className='text-xs text-muted-foreground mt-1'>
-            Move-in:{' '}
-            {new Date(rental.moveInDate).toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            })}
+    <div className='flex items-center gap-4 rounded-2xl border border-border bg-card surface-edge p-4 hover:border-primary/30 transition-colors'>
+      <Link
+        href={`/properties/${rental.propertyId}`}
+        className='flex items-center gap-4 flex-1 min-w-0'
+      >
+        <div
+          className='h-14 w-20 rounded-xl bg-secondary shrink-0 bg-cover bg-center'
+          style={image ? { backgroundImage: `url(${image})` } : undefined}
+        />
+        <div className='flex-1 min-w-0'>
+          <p className='text-heading text-sm truncate'>
+            {rental.property.title}
           </p>
-        )}
-      </div>
+          <div className='flex items-center gap-1 text-xs text-muted-foreground mt-0.5'>
+            <MapPin className='h-3 w-3 shrink-0' />
+            <span className='truncate'>{rental.property.location}</span>
+          </div>
+          {expanded && (
+            <p className='text-xs text-muted-foreground mt-1'>
+              Move-in:{' '}
+              {new Date(rental.moveInDate).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </p>
+          )}
+        </div>
+      </Link>
+
       <div className='flex flex-col items-end gap-2 shrink-0'>
         <Badge variant='outline' className={cn('text-xs', cfg.className)}>
           {cfg.label}
         </Badge>
-        {rental.status === 'COMPLETED' && (
-          <div onClick={(e) => e.preventDefault()}>
-            <ReviewDialog rentalRequestId={rental.id} />
-          </div>
-        )}
         <p className='text-heading text-sm'>
           ৳{Number(rental.property.price).toLocaleString()}
           <span className='text-muted-foreground font-normal text-xs'>/mo</span>
         </p>
+        {rental.status === 'APPROVED' && (
+          <Button asChild size='sm' className='h-7 text-xs gap-1'>
+            <Link href={`/dashboard/tenant/requests/${rental.id}/pay`}>
+              <CreditCard className='h-3 w-3' />
+              Pay now
+            </Link>
+          </Button>
+        )}
       </div>
-    </Link>
+    </div>
   );
 }
 
