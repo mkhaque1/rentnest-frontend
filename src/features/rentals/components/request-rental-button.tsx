@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useCreateRental } from '../hooks/use-create-rental';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 export function RequestRentalButton({
   propertyId,
@@ -64,11 +65,9 @@ export function RequestRentalButton({
           setOpen(false);
           router.push('/dashboard/tenant');
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onError: (err: any) => {
-          toast.error(
-            err?.response?.data?.message ?? 'Failed to submit request',
-          );
+
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, 'Failed to submit request'));
         },
       },
     );

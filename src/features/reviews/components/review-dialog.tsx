@@ -14,6 +14,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useCreateReview } from '../hooks/use-create-review';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 export function ReviewDialog({ rentalRequestId }: { rentalRequestId: string }) {
   const [open, setOpen] = useState(false);
@@ -38,11 +39,8 @@ export function ReviewDialog({ rentalRequestId }: { rentalRequestId: string }) {
           toast.success('Review submitted — thank you!');
           setOpen(false);
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onError: (err: any) => {
-          toast.error(
-            err?.response?.data?.message ?? 'Could not submit review',
-          );
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, 'Could not submit review'));
         },
       },
     );

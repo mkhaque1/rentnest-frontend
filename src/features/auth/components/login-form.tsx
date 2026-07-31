@@ -13,6 +13,7 @@ import { useAuth } from '../hooks/use-auth';
 import { loginSchema, LoginInput } from '../schema/auth-schema';
 import { ApiResponse } from '@/types/api';
 import { AuthResult } from '@/types/user';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 export function LoginForm() {
   const router = useRouter();
@@ -45,9 +46,8 @@ export function LoginForm() {
       };
 
       router.push(redirectTo || redirectMap[user.role]);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Invalid email or password');
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, 'Invalid email or password'));
     } finally {
       setIsSubmitting(false);
     }

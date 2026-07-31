@@ -13,6 +13,7 @@ import { PropertyInput } from '@/features/properties/schemas/property-schema';
 import { apiClient } from '@/lib/api-client';
 import { ApiResponse } from '@/types/api';
 import { PropertyCategory, Property } from '@/types/property';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 function sanitizeImageUrl(url: string): string {
   try {
@@ -29,7 +30,10 @@ function sanitizeImageUrl(url: string): string {
 
 function parseImages(raw?: string): string[] {
   if (!raw) return [];
-  return raw.split(',').map((u) => sanitizeImageUrl(u.trim())).filter(Boolean);
+  return raw
+    .split(',')
+    .map((u) => sanitizeImageUrl(u.trim()))
+    .filter(Boolean);
 }
 
 export default function EditPropertyPage({
@@ -65,7 +69,10 @@ export default function EditPropertyPage({
       {
         ...values,
         amenities: values.amenities
-          ? values.amenities.split(',').map((a) => a.trim()).filter(Boolean)
+          ? values.amenities
+              .split(',')
+              .map((a) => a.trim())
+              .filter(Boolean)
           : [],
         images: parseImages(values.images),
       },
@@ -74,11 +81,8 @@ export default function EditPropertyPage({
           toast.success('Property updated');
           router.push('/dashboard/landlord');
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onError: (err: any) => {
-          toast.error(
-            err?.response?.data?.message ?? 'Failed to update property',
-          );
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, 'Failed to update property'));
         },
       },
     );

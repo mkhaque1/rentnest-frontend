@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useDeleteProperty } from '../hooks/use-property-mutations';
 import { Property } from '@/types/property';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 export function MyPropertyRow({ property }: { property: Property }) {
   const { mutate: deleteProperty, isPending } = useDeleteProperty();
@@ -25,9 +26,9 @@ export function MyPropertyRow({ property }: { property: Property }) {
   function handleDelete() {
     deleteProperty(property.id, {
       onSuccess: () => toast.success('Property deleted'),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) =>
-        toast.error(err?.response?.data?.message ?? 'Failed to delete'),
+
+      onError: (err: unknown) =>
+        toast.error(getApiErrorMessage(err, 'Failed to delete')),
     });
   }
 
@@ -36,7 +37,8 @@ export function MyPropertyRow({ property }: { property: Property }) {
       <div>
         <p className='text-heading text-base'>{property.title}</p>
         <p className='text-caption text-muted-foreground mt-1'>
-          {property.location} · ৳{Number(property.price).toLocaleString()}/mo · {property.bedrooms} bed · {property.bathrooms} bath
+          {property.location} · ৳{Number(property.price).toLocaleString()}/mo ·{' '}
+          {property.bedrooms} bed · {property.bathrooms} bath
         </p>
       </div>
 

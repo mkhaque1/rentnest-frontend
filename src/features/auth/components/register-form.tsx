@@ -20,6 +20,7 @@ import { useAuth } from '../hooks/use-auth';
 import { registerSchema, RegisterInput } from '../schema/auth-schema';
 import { ApiResponse } from '@/types/api';
 import { AuthResult } from '@/types/user';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -48,11 +49,11 @@ export function RegisterForm() {
       router.push(
         user.role === 'LANDLORD' ? '/dashboard/landlord' : '/dashboard/tenant',
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message ??
-        'Something went wrong. Please try again.';
+    } catch (err: unknown) {
+      const message = getApiErrorMessage(
+        err,
+        'Something went wrong. Please try again.',
+      );
       toast.error(message);
     } finally {
       setIsSubmitting(false);

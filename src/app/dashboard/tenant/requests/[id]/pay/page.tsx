@@ -11,6 +11,7 @@ import { apiClient } from '@/lib/api-client';
 import { ApiResponse } from '@/types/api';
 import { RentalRequest } from '@/types/rental';
 import { useCreatePayment } from '@/features/payments/hooks/use-create-payments';
+import { getApiErrorMessage } from '@/lib/api-error';
 
 export default function PayForRentalPage({
   params,
@@ -35,9 +36,9 @@ export default function PayForRentalPage({
       onSuccess: (data) => {
         window.location.href = data.checkoutUrl;
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        toast.error(err?.response?.data?.message ?? 'Could not start payment');
+
+      onError: (err: unknown) => {
+        toast.error(getApiErrorMessage(err, 'Could not start payment'));
       },
     });
   }
