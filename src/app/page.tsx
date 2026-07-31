@@ -1,13 +1,17 @@
-import { ApiResponse } from '@/types/api';
-import { Property } from '@/types/property';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { PropertyCard } from '@/features/properties/components/property-card';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { ApiResponse } from '@/types/api';
+import { Property } from '@/types/property';
+import { HeroSection } from '@/components/home/hero-section';
+import { HowItWorks } from '@/components/home/how-it-works';
+import { CategorySection } from '@/components/home/category-section';
+import { TrustSection } from '@/components/home/trust-section';
+import { CtaSection } from '@/components/home/cta-section';
 
-// Cache for 5 minutes — avoids hammering the backend on every visit
 export const revalidate = 300;
 
 async function getFeaturedProperties(): Promise<Property[]> {
@@ -24,47 +28,30 @@ async function getFeaturedProperties(): Promise<Property[]> {
   }
 }
 
-export default async function Home() {
+export default async function HomePage() {
   const properties = await getFeaturedProperties();
 
   return (
     <>
       <Navbar />
-
       <main>
-        {/* Hero */}
-        <section className='mx-auto max-w-6xl px-6 pt-20 pb-16'>
-          <div className='max-w-2xl'>
-            <h1 className='text-display text-5xl md:text-6xl'>
-              Find your next home, without the noise.
-            </h1>
-            <p className='text-body mt-5 text-lg max-w-lg'>
-              Browse verified listings, request a viewing, and move in — every
-              step handled in one place.
-            </p>
-            <div className='flex items-center gap-3 mt-8'>
-              <Button size='lg' asChild>
-                <Link href='/properties'>
-                  <Search className='h-4 w-4' />
-                  Browse properties
-                </Link>
-              </Button>
-              <Button size='lg' variant='outline' asChild>
-                <Link href='/auth/register'>List your property</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+        <HeroSection />
+        <HowItWorks />
 
-        {/* Featured properties */}
-        <section className='mx-auto max-w-6xl px-6 pb-24'>
-          <div className='flex items-end justify-between mb-6'>
-            <h2 className='text-heading text-2xl'>Featured listings</h2>
+        {/* Featured listings */}
+        <section className='mx-auto max-w-6xl px-6 py-20'>
+          <div className='flex items-end justify-between mb-8'>
+            <div>
+              <p className='text-xs font-semibold text-accent uppercase tracking-widest mb-2'>
+                Latest
+              </p>
+              <h2 className='text-display text-3xl'>Featured listings</h2>
+            </div>
             <Link
               href='/properties'
-              className='text-caption text-muted-foreground hover:text-foreground transition-colors'
+              className='hidden sm:flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors'
             >
-              View all →
+              View all <ArrowRight className='h-4 w-4' />
             </Link>
           </div>
 
@@ -77,9 +64,18 @@ export default async function Home() {
               ))}
             </div>
           )}
-        </section>
-      </main>
 
+          <div className='flex justify-center mt-10 sm:hidden'>
+            <Button variant='outline' asChild className='rounded-xl'>
+              <Link href='/properties'>View all listings</Link>
+            </Button>
+          </div>
+        </section>
+
+        <CategorySection />
+        <TrustSection />
+        <CtaSection />
+      </main>
       <Footer />
     </>
   );

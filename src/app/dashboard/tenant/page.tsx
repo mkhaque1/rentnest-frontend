@@ -224,7 +224,7 @@ function OverviewTab({
   const completedCount = rentals.filter((r) => r.status === 'COMPLETED').length;
   const totalPaid = payments
     .filter((p) => p.status === 'COMPLETED')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .reduce((sum, p) => sum + Number(p.amount), 0);
 
   const stats = [
     {
@@ -448,10 +448,10 @@ function PaymentsTab({
 }) {
   const totalPaid = payments
     .filter((p) => p.status === 'COMPLETED')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .reduce((sum, p) => sum + Number(p.amount), 0);
   const totalPending = payments
     .filter((p) => p.status === 'PENDING')
-    .reduce((sum, p) => sum + p.amount, 0);
+    .reduce((sum, p) => sum + Number(p.amount), 0);
 
   return (
     <div className='space-y-6'>
@@ -696,7 +696,7 @@ function PaymentRow({ payment, last }: { payment: Payment; last: boolean }) {
       </div>
       <div className='flex flex-col items-end gap-1.5 shrink-0'>
         <p className='text-heading text-sm'>
-          ৳{payment.amount.toLocaleString()}
+          ৳{Number(payment.amount).toLocaleString()}
         </p>
         <Badge variant='outline' className={cn('text-xs', cfg.className)}>
           {cfg.label}

@@ -4,7 +4,7 @@ export interface Payment {
   id: string;
   transactionId: string;
   rentalRequestId: string;
-  amount: number;
+  amount: number | string;
   provider: 'STRIPE' | 'SSLCOMMERZ';
   status: PaymentStatus;
   paidAt?: string;
