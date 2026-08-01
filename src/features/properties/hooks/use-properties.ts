@@ -37,12 +37,13 @@ export function useProperties(filters: PropertyFilters) {
       }
 
       // Build clean params — never send `type` to the backend
+      // minPrice/maxPrice must be numbers — backend passes them directly to Prisma
       const params: Record<string, string | number | undefined> = {
-        location:   filters.location   || undefined,
-        minPrice:   filters.minPrice   || undefined,
-        maxPrice:   filters.maxPrice   || undefined,
-        categoryId: resolvedCategoryId || undefined,
-        page:       filters.page       || undefined,
+        location:   filters.location                                  || undefined,
+        minPrice:   filters.minPrice ? Number(filters.minPrice)       : undefined,
+        maxPrice:   filters.maxPrice ? Number(filters.maxPrice)       : undefined,
+        categoryId: resolvedCategoryId                                || undefined,
+        page:       filters.page                                      || undefined,
       };
 
       // Strip undefined values
