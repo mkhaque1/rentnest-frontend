@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Home, LayoutDashboard, FileText, Settings, Plus } from 'lucide-react';
+import { Home, LayoutDashboard, FileText, Settings, Plus, Star, TrendingUp, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -12,13 +12,17 @@ import { useMyProperties } from '@/features/properties/hooks/use-my-properties';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout';
 import { DashboardNavItem } from '@/components/dashboard/dashboard-sidebar';
+import { StatCard } from '@/components/dashboard/stat-card';
+import { usePropertyReviews, PropertyReviewItem } from '@/features/reviews/hooks/use-property-reviews';
+import { cn } from '@/lib/utils';
 
-type NavItem = 'overview' | 'properties' | 'requests' | 'settings';
+type NavItem = 'overview' | 'properties' | 'requests' | 'reviews' | 'settings';
 
 const NAV_ITEMS: DashboardNavItem[] = [
   { id: 'overview',   label: 'Overview',       icon: LayoutDashboard },
   { id: 'properties', label: 'My Properties',  icon: Home            },
   { id: 'requests',   label: 'Requests',        icon: FileText        },
+  { id: 'reviews',    label: 'Reviews',         icon: Star            },
   { id: 'settings',   label: 'Settings',        icon: Settings        },
 ];
 
@@ -44,6 +48,7 @@ export default function LandlordDashboardPage() {
       {active === 'overview'   && <OverviewTab user={user} onNav={setActive} />}
       {active === 'properties' && <PropertiesTab />}
       {active === 'requests'   && <RequestsTab />}
+      {active === 'reviews'    && <ReviewsTab />}
       {active === 'settings'   && <SettingsTab user={user} />}
     </DashboardLayout>
   );
@@ -57,6 +62,14 @@ function OverviewTab({ user, onNav }: {
   const { data: properties, isLoading } = useMyProperties();
   const firstName = user?.name?.split(' ')[0] ?? 'there';
 
+  const totalListings  = properties?.length ?? 0;
+  const activeRented   = properties?.filter((p) => p.status === 'RENTED').length ?? 0;
+  const available      = properties?.filter((p) => p.status === 'AVAILABLE').length ?? 0;
+  // Monthly earnings = sum of price for all RENTED properties
+  const monthlyEarning = properties
+    ?.filter((p) => p.status === 'RENTED')
+    .reduce((sum, p) => sum + Number(p.price), 0) ?? 0;
+
   return (
     <div className='space-y-8'>
       <div className='flex items-center justify-between'>
@@ -69,6 +82,18 @@ function OverviewTab({ user, onNav }: {
         </Button>
       </div>
 
+      {/* Stat cards */}
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className='h-28 rounded-2xl' />)
+          : <>
+              <StatCard label='Total Listings'    value={totalListings}                        icon={Building2}   color='text-primary'     bg='bg-primary/10'     />
+              <StatCard label='Currently Rented'  value={activeRented}                         icon={Home}        color='text-emerald-400' bg='bg-emerald-500/10' />
+              <StatCard label='Available'         value={available}                            icon={FileText}    color='text-sky-400'     bg='bg-sky-500/10'     />
+              <StatCard label='Monthly Earnings'  value={`৳${monthlyEarning.toLocaleString()}`} icon={TrendingUp} color='text-accent'      bg='bg-accent/10'      />
+            </>}
+      </div>
+
       {/* Quick links */}
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <button onClick={() => onNav('properties')}
@@ -79,7 +104,7 @@ function OverviewTab({ user, onNav }: {
           <div>
             <p className='text-heading text-sm'>My Properties</p>
             <p className='text-caption text-muted-foreground text-xs mt-0.5'>
-              {isLoading ? '…' : `${properties?.length ?? 0} listing${(properties?.length ?? 0) !== 1 ? 's' : ''}`}
+              {isLoading ? '…' : `${totalListings} listing${totalListings !== 1 ? 's' : ''}`}
             </p>
           </div>
         </button>
@@ -127,8 +152,6 @@ function OverviewTab({ user, onNav }: {
     </div>
   );
 }
-
-/* ─── Properties tab ─────────────────────────────────────── */
 function PropertiesTab() {
   const { data: properties, isLoading } = useMyProperties();
 
@@ -171,6 +194,114 @@ function RequestsTab() {
         <Button asChild className='rounded-xl'>
           <Link href='/dashboard/landlord/requests'>Go to requests</Link>
         </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Reviews tab ────────────────────────────────────────── */
+function ReviewsTab() {
+  const { data: properties, isLoading: propsLoading } = useMyProperties();
+
+  if (propsLoading) {
+    return (
+      <div className='space-y-6'>
+        <div>
+          <h1 className='text-display text-2xl'>Reviews</h1>
+          <p className='text-body text-sm mt-1'>What tenants say about your properties.</p>
+        </div>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className='h-24 rounded-2xl' />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className='space-y-6'>
+      <div>
+        <h1 className='text-display text-2xl'>Reviews</h1>
+        <p className='text-body text-sm mt-1'>What tenants say about your properties.</p>
+      </div>
+
+      {!properties || properties.length === 0 ? (
+        <EmptyState message="You haven't listed any properties yet." />
+      ) : (
+        properties.map((property) => (
+          <PropertyReviewSection key={property.id} propertyId={property.id} propertyTitle={property.title} />
+        ))
+      )}
+    </div>
+  );
+}
+
+function PropertyReviewSection({
+  propertyId,
+  propertyTitle,
+}: {
+  propertyId: string;
+  propertyTitle: string;
+}) {
+  const { data: reviews, isLoading } = usePropertyReviews(propertyId);
+
+  if (isLoading) return <Skeleton className='h-24 rounded-2xl' />;
+  if (!reviews || reviews.length === 0) return null;
+
+  const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+
+  return (
+    <div className='rounded-2xl border border-border bg-card surface-edge overflow-hidden'>
+      <div className='px-5 py-4 border-b border-border flex items-center justify-between'>
+        <div>
+          <p className='text-heading text-sm'>{propertyTitle}</p>
+          <p className='text-xs text-muted-foreground mt-0.5'>{reviews.length} review{reviews.length !== 1 ? 's' : ''}</p>
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <span className='text-heading text-lg'>{avg.toFixed(1)}</span>
+          <div className='flex gap-0.5'>
+            {[1,2,3,4,5].map((s) => (
+              <Star
+                key={s}
+                className={cn(
+                  'h-4 w-4',
+                  s <= Math.round(avg) ? 'fill-accent text-accent' : 'text-muted-foreground/30',
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+      {reviews.map((review, i) => (
+        <ReviewRow key={review.id} review={review} last={i === reviews.length - 1} />
+      ))}
+    </div>
+  );
+}
+
+function ReviewRow({ review, last }: { review: PropertyReviewItem; last: boolean }) {
+  return (
+    <div className={cn('px-5 py-4', !last && 'border-b border-border')}>
+      <div className='flex items-start justify-between gap-4'>
+        <div className='flex-1 min-w-0'>
+          <div className='flex items-center gap-2 mb-1'>
+            <p className='text-sm font-medium'>{review.tenant.name}</p>
+            <span className='text-xs text-muted-foreground'>
+              {new Date(review.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
+          </div>
+          <p className='text-sm text-muted-foreground'>{review.comment}</p>
+        </div>
+        <div className='flex items-center gap-0.5 shrink-0'>
+          {[1,2,3,4,5].map((s) => (
+            <Star
+              key={s}
+              className={cn(
+                'h-3.5 w-3.5',
+                s <= review.rating ? 'fill-accent text-accent' : 'text-muted-foreground/30',
+              )}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

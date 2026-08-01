@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, BedDouble, Bath } from 'lucide-react';
+import { MapPin, BedDouble } from 'lucide-react';
 import { Property } from '@/types/property';
 import { cn } from '@/lib/utils';
 
@@ -8,8 +8,6 @@ export function PropertyCard({ property }: { property: Property }) {
   const image = property.images?.[0];
   const price = Number(property.price).toLocaleString();
   const isAvailable = property.status === 'AVAILABLE';
-  const bedrooms = property.bedrooms ?? 0;
-  const bathrooms = property.bathrooms ?? 0;
 
   return (
     <Link
@@ -48,7 +46,12 @@ export function PropertyCard({ property }: { property: Property }) {
                 : 'bg-black/40 border-white/10 text-white/60',
             )}
           >
-            <span className={cn('h-1.5 w-1.5 rounded-full', isAvailable ? 'bg-emerald-400' : 'bg-white/40')} />
+            <span
+              className={cn(
+                'h-1.5 w-1.5 rounded-full',
+                isAvailable ? 'bg-emerald-400' : 'bg-white/40',
+              )}
+            />
             {isAvailable ? 'Available' : 'Rented'}
           </span>
         </div>
@@ -64,7 +67,9 @@ export function PropertyCard({ property }: { property: Property }) {
 
       {/* Body */}
       <div className='p-4'>
-        <h3 className='text-heading text-sm line-clamp-1 mb-1.5'>{property.title}</h3>
+        <h3 className='text-heading text-sm line-clamp-1 mb-1.5'>
+          {property.title}
+        </h3>
 
         <div className='flex items-center gap-1 text-xs text-muted-foreground mb-3'>
           <MapPin className='h-3 w-3 shrink-0' />
@@ -72,16 +77,6 @@ export function PropertyCard({ property }: { property: Property }) {
         </div>
 
         <div className='flex items-center justify-between pt-3 border-t border-border'>
-          <div className='flex items-center gap-3 text-xs text-muted-foreground'>
-            <span className='flex items-center gap-1'>
-              <BedDouble className='h-3.5 w-3.5' />
-              {bedrooms} {bedrooms === 1 ? 'bed' : 'beds'}
-            </span>
-            <span className='flex items-center gap-1'>
-              <Bath className='h-3.5 w-3.5' />
-              {bathrooms} {bathrooms === 1 ? 'bath' : 'baths'}
-            </span>
-          </div>
           <span className='text-xs text-muted-foreground group-hover:text-foreground transition-colors'>
             View →
           </span>

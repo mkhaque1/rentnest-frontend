@@ -11,12 +11,9 @@ import { Property } from '@/types/property';
 
 async function getProperty(id: string): Promise<Property | null> {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/api/properties/${id}`,
-      {
-        next: { revalidate: 60 },
-      },
-    );
+    const res = await fetch(`${API_BASE_URL}/api/properties/${id}`, {
+      next: { revalidate: 60 },
+    });
     if (!res.ok) return null;
     const json: ApiResponse<Property> = await res.json();
     return json.data;
@@ -37,8 +34,6 @@ export default async function PropertyDetailsPage({
     notFound();
   }
 
-  const bedrooms = property.bedrooms ?? 0;
-  const bathrooms = property.bathrooms ?? 0;
   const amenities = property.amenities ?? [];
 
   return (
@@ -74,22 +69,7 @@ export default async function PropertyDetailsPage({
                 <MapPin className='h-4 w-4' />
                 {property.location}
               </div>
-              <div className='flex items-center gap-4 mt-3 text-caption text-muted-foreground'>
-                <span className='flex items-center gap-1.5'>
-                  <BedDouble className='h-4 w-4' />
-                  {bedrooms} {bedrooms === 1 ? 'bedroom' : 'bedrooms'}
-                </span>
-                <span className='flex items-center gap-1.5'>
-                  <Bath className='h-4 w-4' />
-                  {bathrooms} {bathrooms === 1 ? 'bathroom' : 'bathrooms'}
-                </span>
-                {property.area && (
-                  <span className='flex items-center gap-1.5'>
-                    <Ruler className='h-4 w-4' />
-                    {property.area} sq ft
-                  </span>
-                )}
-              </div>
+              <div className='flex items-center gap-4 mt-3 text-caption text-muted-foreground'></div>
             </div>
 
             <p className='text-body leading-relaxed'>{property.description}</p>
@@ -135,8 +115,12 @@ export default async function PropertyDetailsPage({
                       : 'bg-destructive/15 text-destructive border-destructive/30'
                   }`}
                 >
-                  <span className={`h-1.5 w-1.5 rounded-full ${property.status === 'AVAILABLE' ? 'bg-emerald-400' : 'bg-destructive'}`} />
-                  {property.status === 'AVAILABLE' ? 'Available' : 'Currently rented'}
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${property.status === 'AVAILABLE' ? 'bg-emerald-400' : 'bg-destructive'}`}
+                  />
+                  {property.status === 'AVAILABLE'
+                    ? 'Available'
+                    : 'Currently rented'}
                 </span>
               </div>
               <RequestRentalButton
