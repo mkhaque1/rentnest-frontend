@@ -11,19 +11,19 @@ This repository contains the **frontend** application. The backend API is mainta
 ### Tenant
 
 - Browse and filter properties by location, price, and category
-- View detailed property pages with images, amenities, bedrooms/bathrooms
+- View detailed property pages with images, amenities, and type
 - Submit rental requests with move-in date and message
 - Track request status (Pending → Approved → Active → Completed)
-- Make payments via Stripe/SSLCommerz
+- Make payments via Stripe
 - Leave reviews on completed rentals
 - Personal dashboard with rental history, payment history, and stats
 
 ### Landlord
 
-- List new properties with images, pricing, amenities, and category
+- List new properties with type, pricing, amenities, and category
 - Edit and delete existing listings
 - Review incoming rental requests — approve, reject, or mark as completed
-- Dashboard showing all listings with status and quick edit access
+- Dashboard with earnings stats, property list, and reviews from tenants
 
 ### Admin
 
@@ -93,9 +93,18 @@ src/
     └── user.ts                 # User, Role, AuthResult types
 ```
 
----
+### Components structure update
 
-## Getting Started
+```
+├── components/
+│   ├── dashboard/              # Shared dashboard shell (layout, sidebar, topbar, stat-card)
+│   ├── home/                   # Home page section components
+│   ├── layout/                 # Navbar, Footer
+│   ├── shared/                 # EmptyState, etc.
+│   └── ui/                     # Base UI components (shadcn)
+```
+
+---
 
 ### Prerequisites
 
@@ -119,7 +128,7 @@ cp .env.example .env.local
 ```
 
 ```env
-NEXT_PUBLIC_API_URL=https://your-backend-url.vercel.app
+NEXT_PUBLIC_API_URL=https://rentnest-bakend.vercel.app
 ```
 
 For local development with the backend running on port 5000:
@@ -149,26 +158,33 @@ npm run start
 
 The backend is a separate project: **RentNest Backend**
 
-It provides a REST API built with Node.js/Express and Prisma ORM. Key endpoints used by this frontend:
+It is deployed at: **https://rentnest-bakend.vercel.app**
 
-| Resource   | Base path         |
-| ---------- | ----------------- |
-| Auth       | `/api/auth`       |
-| Properties | `/api/properties` |
-| Categories | `/api/categories` |
-| Rentals    | `/api/rentals`    |
-| Payments   | `/api/payments`   |
-| Reviews    | `/api/reviews`    |
-| Admin      | `/api/admin`      |
+Built with Node.js/Express and Prisma ORM. Key endpoints used by this frontend:
+
+| Resource   | Base path                         |
+| ---------- | --------------------------------- |
+| Auth       | `/api/auth`                       |
+| Properties | `/api/properties`                 |
+| My listings| `/api/properties/my/listings`     |
+| Categories | `/api/categories`                 |
+| Rentals    | `/api/rentals`                    |
+| Landlord rentals | `/api/rentals/landlord/requests` |
+| Payments   | `/api/payments`                   |
+| Reviews    | `/api/reviews`                    |
+| Admin      | `/api/admin`                      |
 
 ---
 
 ## Test Credentials
 
-| Role     | Email             | Password |
-| -------- | ----------------- | -------- |
-| Tenant   | tenant@test.com   | 123456   |
-| Landlord | landlord@test.com | 123456   |
+| Role     | Email                   | Password   |
+| -------- | ----------------------- | ---------- |
+| Tenant   | tenant1@example.com     | password123 |
+| Landlord | landlord1@example.com   | password123 |
+| Admin    | admin@rentnest.com      | admin123    |
+
+> Register new tenant/landlord accounts via `/auth/register` — credentials above are for the live deployed backend.
 
 ---
 
