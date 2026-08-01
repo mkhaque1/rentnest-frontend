@@ -271,24 +271,23 @@ function CategoriesTab() {
   const { mutate: updateCat, isPending: updating } = useUpdateCategory();
   const { mutate: deleteCat, isPending: deleting } = useDeleteCategory();
 
-  const [showForm, setShowForm]       = useState(false);
-  const [editTarget, setEditTarget]   = useState<PropertyCategory | null>(null);
-  const [name, setName]               = useState('');
-  const [description, setDescription] = useState('');
+  const [showForm, setShowForm]     = useState(false);
+  const [editTarget, setEditTarget] = useState<PropertyCategory | null>(null);
+  const [name, setName]             = useState('');
 
-  function openCreate() { setEditTarget(null); setName(''); setDescription(''); setShowForm(true); }
-  function openEdit(cat: PropertyCategory) { setEditTarget(cat); setName(cat.name); setDescription(cat.description ?? ''); setShowForm(true); }
-  function closeForm() { setShowForm(false); setEditTarget(null); setName(''); setDescription(''); }
+  function openCreate() { setEditTarget(null); setName(''); setShowForm(true); }
+  function openEdit(cat: PropertyCategory) { setEditTarget(cat); setName(cat.name); setShowForm(true); }
+  function closeForm() { setShowForm(false); setEditTarget(null); setName(''); }
 
   function handleSave() {
     if (!name.trim()) { toast.error('Name is required'); return; }
     if (editTarget) {
-      updateCat({ id: editTarget.id, name: name.trim(), description: description.trim() }, {
+      updateCat({ id: editTarget.id, name: name.trim() }, {
         onSuccess: () => { toast.success('Category updated'); closeForm(); },
         onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to update')),
       });
     } else {
-      createCat({ name: name.trim(), description: description.trim() }, {
+      createCat({ name: name.trim() }, {
         onSuccess: () => { toast.success('Category created'); closeForm(); },
         onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Failed to create')),
       });
@@ -323,14 +322,10 @@ function CategoriesTab() {
               <X className='h-4 w-4' />
             </button>
           </div>
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <div className='max-w-xs space-y-1.5'>
             <div className='space-y-1.5'>
               <Label>Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} placeholder='e.g. Apartment' className='rounded-xl' />
-            </div>
-            <div className='space-y-1.5'>
-              <Label>Description</Label>
-              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder='Short description' className='rounded-xl' />
             </div>
           </div>
           <div className='flex gap-2'>

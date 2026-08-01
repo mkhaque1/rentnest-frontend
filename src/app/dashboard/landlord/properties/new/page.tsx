@@ -20,31 +20,22 @@ export default function NewPropertyPage() {
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const res =
-        await apiClient.get<ApiResponse<PropertyCategory[]>>('/api/categories');
+      const res = await apiClient.get<ApiResponse<PropertyCategory[]>>('/api/categories');
       return res.data.data;
     },
   });
 
   function handleSubmit(values: PropertyInput) {
-    const selectedCategory = categories?.find(
-      (category) => category.id === values.categoryId,
-    );
-
-    if (!selectedCategory) {
-      toast.error('Please select a valid category');
-      return;
-    }
-
     mutate(
       {
-        ...values,
-        type: selectedCategory.name,
-        amenities: values.amenities
-          ? values.amenities
-              .split(',')
-              .map((a) => a.trim())
-              .filter(Boolean)
+        title:       values.title,
+        description: values.description,
+        location:    values.location,
+        price:       values.price,
+        type:        values.type,
+        categoryId:  values.categoryId,
+        amenities:   values.amenities
+          ? values.amenities.split(',').map((a) => a.trim()).filter(Boolean)
           : [],
       },
       {

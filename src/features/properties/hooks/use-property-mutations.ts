@@ -13,6 +13,7 @@ interface PropertyPayload {
   type: string;
   categoryId: string;
   amenities?: string[];
+  images?: string[];
 }
 
 export function useCreateProperty() {

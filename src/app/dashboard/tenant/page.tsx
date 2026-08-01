@@ -75,7 +75,7 @@ export default function TenantDashboardPage() {
         <OverviewTab user={user} rentals={rentals} payments={payments}
           rentalsLoading={rentalsLoading} paymentsLoading={paymentsLoading} onNav={setActive} />
       )}
-      {active === 'rentals'  && <RentalsTab rentals={rentals} isLoading={rentalsLoading} />}
+      {active === 'rentals'  && <RentalsTab rentals={rentals} payments={payments} isLoading={rentalsLoading} />}
       {active === 'payments' && <PaymentsTab payments={payments} isLoading={paymentsLoading} />}
       {active === 'profile'  && <ProfileTab user={user} />}
     </DashboardLayout>
@@ -135,7 +135,15 @@ function OverviewTab({ user, rentals, payments, rentalsLoading, paymentsLoading,
         ) : rentals.length === 0 ? (
           <EmptyState message="You haven't submitted any rental requests yet." />
         ) : (
-          <div className='space-y-3'>{rentals.slice(0, 2).map((r) => <RentalRow key={r.id} rental={r} />)}</div>
+          <div className='space-y-3'>
+            {rentals.slice(0, 2).map((r) => (
+              <RentalRow
+                key={r.id}
+                rental={r}
+                payment={payments.find((p) => p.rentalRequestId === r.id)}
+              />
+            ))}
+          </div>
         )}
       </div>
 
@@ -164,7 +172,15 @@ function OverviewTab({ user, rentals, payments, rentalsLoading, paymentsLoading,
 }
 
 /* ─── Rentals tab ────────────────────────────────────────── */
-function RentalsTab({ rentals, isLoading }: { rentals: RentalRequest[]; isLoading: boolean }) {
+function RentalsTab({
+  rentals,
+  payments,
+  isLoading,
+}: {
+  rentals: RentalRequest[];
+  payments: Payment[];
+  isLoading: boolean;
+}) {
   const [filter, setFilter] = useState<string>('All');
   const filters = ['All', 'ACTIVE', 'PENDING', 'APPROVED', 'COMPLETED', 'REJECTED'];
   const labels: Record<string, string> = { All: 'All', ACTIVE: 'Active', PENDING: 'Pending', APPROVED: 'Approved', COMPLETED: 'Completed', REJECTED: 'Rejected' };
@@ -195,7 +211,16 @@ function RentalsTab({ rentals, isLoading }: { rentals: RentalRequest[]; isLoadin
       ) : visible.length === 0 ? (
         <EmptyState message='No rentals match this filter.' />
       ) : (
-        <div className='space-y-3'>{visible.map((r) => <RentalRow key={r.id} rental={r} expanded />)}</div>
+        <div className='space-y-3'>
+          {visible.map((r) => (
+            <RentalRow
+              key={r.id}
+              rental={r}
+              payment={payments.find((p) => p.rentalRequestId === r.id)}
+              expanded
+            />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -280,9 +305,18 @@ function ProfileTab({ user }: { user: ReturnType<typeof useAuth>['user'] }) {
 }
 
 /* ─── Shared row components ──────────────────────────────── */
-function RentalRow({ rental, expanded = false }: { rental: RentalRequest; expanded?: boolean }) {
+function RentalRow({
+  rental,
+  payment,
+  expanded = false,
+}: {
+  rental: RentalRequest;
+  payment?: Payment;
+  expanded?: boolean;
+}) {
   const cfg   = STATUS_CONFIG[rental.status] ?? STATUS_CONFIG.PENDING;
   const image = rental.property.images?.[0];
+  const paymentCfg = payment ? STATUS_CONFIG[payment.status] : undefined;
 
   return (
     <div className='flex items-center gap-4 rounded-2xl border border-border bg-card surface-edge p-4 hover:border-primary/30 transition-colors'>
@@ -305,10 +339,15 @@ function RentalRow({ rental, expanded = false }: { rental: RentalRequest; expand
       <div className='flex flex-col items-end gap-2 shrink-0'>
         <Badge variant='outline' className={cn('text-xs', cfg.className)}>{cfg.label}</Badge>
         <p className='text-heading text-sm'>৳{Number(rental.property.price).toLocaleString()}<span className='text-muted-foreground font-normal text-xs'>/mo</span></p>
-        {rental.status === 'APPROVED' && (
+        {rental.status === 'APPROVED' && !payment && (
           <Button asChild size='sm' className='h-7 text-xs gap-1'>
             <Link href={`/dashboard/tenant/requests/${rental.id}/pay`}><CreditCard className='h-3 w-3' />Pay now</Link>
           </Button>
+        )}
+        {rental.status === 'APPROVED' && payment && paymentCfg && (
+          <Badge variant='outline' className={cn('text-xs', paymentCfg.className)}>
+            Payment {paymentCfg.label.toLowerCase()}
+          </Badge>
         )}
         {rental.status === 'COMPLETED' && (
           <div onClick={(e) => e.preventDefault()}><ReviewDialog rentalRequestId={rental.id} /></div>

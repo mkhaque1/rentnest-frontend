@@ -27,9 +27,7 @@ export default function EditPropertyPage({
   const { data: property, isLoading } = useQuery({
     queryKey: ['properties', id],
     queryFn: async () => {
-      const res = await apiClient.get<ApiResponse<Property>>(
-        `/api/properties/${id}`,
-      );
+      const res = await apiClient.get<ApiResponse<Property>>(`/api/properties/${id}`);
       return res.data.data;
     },
   });
@@ -37,31 +35,22 @@ export default function EditPropertyPage({
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const res =
-        await apiClient.get<ApiResponse<PropertyCategory[]>>('/api/categories');
+      const res = await apiClient.get<ApiResponse<PropertyCategory[]>>('/api/categories');
       return res.data.data;
     },
   });
 
   function handleSubmit(values: PropertyInput) {
-    const selectedCategory = categories?.find(
-      (category) => category.id === values.categoryId,
-    );
-
-    if (!selectedCategory) {
-      toast.error('Please select a valid category');
-      return;
-    }
-
     mutate(
       {
-        ...values,
-        type: selectedCategory.name,
-        amenities: values.amenities
-          ? values.amenities
-              .split(',')
-              .map((a) => a.trim())
-              .filter(Boolean)
+        title:       values.title,
+        description: values.description,
+        location:    values.location,
+        price:       values.price,
+        type:        values.type,
+        categoryId:  values.categoryId,
+        amenities:   values.amenities
+          ? values.amenities.split(',').map((a) => a.trim()).filter(Boolean)
           : [],
       },
       {
@@ -86,12 +75,13 @@ export default function EditPropertyPage({
           <PropertyForm
             categories={categories ?? []}
             defaultValues={{
-              title: property.title,
+              title:       property.title,
               description: property.description,
-              location: property.location,
-              price: Number(property.price),
-              categoryId: property.categoryId,
-              amenities: property.amenities?.join(', '),
+              location:    property.location,
+              price:       Number(property.price),
+              type:        property.type ?? '',
+              categoryId:  property.categoryId,
+              amenities:   property.amenities?.join(', '),
             }}
             onSubmit={handleSubmit}
             isSubmitting={isPending}

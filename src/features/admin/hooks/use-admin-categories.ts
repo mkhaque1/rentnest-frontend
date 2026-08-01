@@ -18,7 +18,7 @@ export function useAdminCategories() {
 export function useCreateCategory() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { name: string; description: string }) => {
+    mutationFn: async (payload: { name: string }) => {
       const res = await apiClient.post<ApiResponse<PropertyCategory>>('/api/categories', payload);
       return res.data.data;
     },
@@ -29,7 +29,7 @@ export function useCreateCategory() {
 export function useUpdateCategory() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...payload }: { id: string; name: string; description: string }) => {
+    mutationFn: async ({ id, ...payload }: { id: string; name: string }) => {
       const res = await apiClient.patch<ApiResponse<PropertyCategory>>(`/api/categories/${id}`, payload);
       return res.data.data;
     },

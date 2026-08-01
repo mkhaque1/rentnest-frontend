@@ -33,14 +33,10 @@ export interface Property {
   description: string;
   location: string;
   price: number | string;
-  type?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  area?: number | null;
+  type: string;
   amenities?: string[];
   images?: string[];
   status: PropertyStatus;
-  isPublished?: boolean;
   landlordId: string;
   categoryId: string;
   createdAt: string;

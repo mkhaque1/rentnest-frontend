@@ -43,6 +43,7 @@ export function PropertyForm({
   });
 
   const { field: categoryField } = useController({ name: 'categoryId', control });
+  const { field: typeField }     = useController({ name: 'type',       control });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
@@ -84,23 +85,40 @@ export function PropertyForm({
         </div>
       </div>
 
-      <div className='space-y-1.5'>
-        <Label>Category</Label>
-        <Select value={categoryField.value} onValueChange={categoryField.onChange}>
-          <SelectTrigger>
-            <SelectValue placeholder='Select category' />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.categoryId && (
-          <p className='text-caption text-destructive'>{errors.categoryId.message}</p>
-        )}
+      <div className='grid grid-cols-2 gap-4'>
+        {/* Type — free text e.g. "apartment", "villa" */}
+        <div className='space-y-1.5'>
+          <Label htmlFor='type'>Property type</Label>
+          <Input
+            id='type'
+            placeholder='e.g. apartment, villa'
+            value={typeField.value ?? ''}
+            onChange={typeField.onChange}
+          />
+          {errors.type && (
+            <p className='text-caption text-destructive'>{errors.type.message}</p>
+          )}
+        </div>
+
+        {/* Category — from API */}
+        <div className='space-y-1.5'>
+          <Label>Category</Label>
+          <Select value={categoryField.value} onValueChange={categoryField.onChange}>
+            <SelectTrigger>
+              <SelectValue placeholder='Select category' />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.categoryId && (
+            <p className='text-caption text-destructive'>{errors.categoryId.message}</p>
+          )}
+        </div>
       </div>
 
       <div className='space-y-1.5'>

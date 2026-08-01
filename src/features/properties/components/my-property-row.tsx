@@ -30,9 +30,14 @@ export function MyPropertyRow({ property }: { property: Property }) {
   function handleDelete() {
     deleteProperty(property.id, {
       onSuccess: () => toast.success('Property deleted'),
-
-      onError: (err: unknown) =>
-        toast.error(getApiErrorMessage(err, 'Failed to delete')),
+      onError: (err: unknown) => {
+        const msg = getApiErrorMessage(err, 'Failed to delete');
+        if (msg.toLowerCase().includes('foreign key') || msg.toLowerCase().includes('rental')) {
+          toast.error('Cannot delete — this property has rental requests. Cancel or complete them first.');
+        } else {
+          toast.error(msg);
+        }
+      },
     });
   }
 
@@ -66,8 +71,9 @@ export function MyPropertyRow({ property }: { property: Property }) {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete this property?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. The listing will be permanently
-                removed.
+                This action cannot be undone. The listing will be permanently removed.
+                <br /><br />
+                <span className='text-amber-400 font-medium'>Note:</span> Properties with active rental requests cannot be deleted. Cancel or complete all rentals first.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
